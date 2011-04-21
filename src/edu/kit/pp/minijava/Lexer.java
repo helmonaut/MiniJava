@@ -210,9 +210,9 @@ public class Lexer {
 	}
 
 	private Token ifThenElse(int c, String t1, String t2) throws IOException {
-		c = read();
-		if (c == '=') return new Token(t1);
-		else unread(c);
+		int n = read();
+		if (n == c) return new Token(t1);
+		else unread(n);
 		return new Token(t2);
 	}
 }
