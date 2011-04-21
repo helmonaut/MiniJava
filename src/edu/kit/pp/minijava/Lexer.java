@@ -1,18 +1,17 @@
 package edu.kit.pp.minijava;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 
 public class Lexer {
 	private PushbackReader _reader;
-	
+
 	public Lexer(Reader reader) throws IOException {
 		_reader = new PushbackReader(new BufferedReader(reader));
 	}
-	
+
 	public Token next() throws IOException {
 		while (true) {
 			int c = read();
@@ -153,7 +152,7 @@ public class Lexer {
 			}
 		}
 	}
-	
+
 	private void skipComment() throws IOException {
 		while (true) {
 			int c = read();
@@ -166,7 +165,7 @@ public class Lexer {
 			}
 		}
 	}
-	
+
 	private Token lexIdentifier(int c) throws IOException {
 		StringBuffer name = new StringBuffer();
 		name.append((char) c);
@@ -181,7 +180,7 @@ public class Lexer {
 			}
 		}
 	}
-	
+
 	private Token lexInteger(int c) throws IOException {
 		StringBuffer name = new StringBuffer();
 		name.append((char) c);
@@ -201,28 +200,19 @@ public class Lexer {
 			}
 		}
 	}
-	
+
 	private int read() throws IOException {
 		return _reader.read();
 	}
-	
+
 	private void unread(int c) throws IOException {
 		_reader.unread(c);
 	}
-	
+
 	private Token ifThenElse(int c, String t1, String t2) throws IOException {
 		c = read();
 		if (c == '=') return new Token(t1);
 		else unread(c);
 		return new Token(t2);
-	}
-	
-	public static void main(String[] args) throws IOException {
-		Lexer l = new Lexer(new FileReader("test.java"));
-		Token n = l.next();
-		while (n != null) {
-			System.out.println(n);
-			n = l.next();
-		}
 	}
 }
