@@ -2,10 +2,13 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+#include <set>
 
 const int KeywordCount = 53;
 
 std::string Keywords[] = {"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "double", "do", "else", "enum", "extends", "false", "finally", "final", "float", "for", "goto", "if", "implements", "import", "instanceof", "interface", "int", "long", "native", "new", "null", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "true", "try", "void", "volatile", "while"};
+
+std::set<std::string> KeywordSet;
 
 const int OperatorCount = 46;
 
@@ -78,8 +81,11 @@ char genIdentChar()
 
 void genIdent(std::string& name)
 {
-  name = genIdentStartChar();
-  while(rand()%10) name+= genIdentChar();
+  do
+  {
+    name = genIdentStartChar();
+    while(rand()%10) name+= genIdentChar();
+  } while(KeywordSet.find(name)!=KeywordSet.end());
 }
 
 
@@ -218,6 +224,8 @@ int main(int argc, char** argv)
   if(argc==2)
     srand(atoi(argv[1]));
   else srand(0);
+
+  for(int i=0;i<KeywordCount;i++) KeywordSet.insert(Keywords[i]);
 
   genProgram();
 
