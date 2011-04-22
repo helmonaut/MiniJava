@@ -164,6 +164,7 @@ public class Lexer {
 			case '*':
 				c = read();
 				if (c == '/') return;
+			        break;
 			case -1: return;
 			default: ;
 			}
