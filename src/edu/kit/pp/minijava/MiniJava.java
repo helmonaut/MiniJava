@@ -1,5 +1,6 @@
 package edu.kit.pp.minijava;
 
+import edu.kit.pp.minijava.tokens.Token;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -16,10 +17,11 @@ public class MiniJava {
         if (args[0].equals("--lextest")) {
             Token nextToken = lexer.next();
 
-            while (nextToken != null) {
+	    while (!nextToken.isEof()) {
                 System.out.println(nextToken);
                 nextToken = lexer.next();
             }
+	    System.out.println(nextToken);
         }
     }
 }

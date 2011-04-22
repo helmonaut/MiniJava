@@ -1,11 +1,11 @@
 // vi:ai:noet sta sw=4 ts=4 sts=0
 package edu.kit.pp.minijava;
 
+import edu.kit.pp.minijava.tokens.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
-
 
 
 public class Lexer {
@@ -31,59 +31,59 @@ public class Lexer {
 					skipComment();
 					break;
 				case '=':
-					return new Token("/=");
+					return operator("/=");
 				default:
 					unread(c);
-					return new Token("/");
+					return operator("/");
 				}
 				break;
 			case '!':
-				return ifThenElse('=', "!=", "!");
+				return operator(ifThenElse('=', "!=", "!"));
 			case '(':
-				return new Token("(");
+				return operator("(");
 			case ')':
-				return new Token(")");
+				return operator(")");
 			case '*':
-				return ifThenElse('=', "*=", "*");
+				return operator(ifThenElse('=', "*=", "*"));
 			case '+':
 				c = read();
 				switch (c) {
-				case '+': return new Token("++");
-				case '=': return new Token("+=");
+				case '+': return operator("++");
+				case '=': return operator("+=");
 				default:
 					unread(c);
-					return new Token("+");
+					return operator("+");
 				}
 			case ',':
-				return new Token(",");
+				return operator(",");
 			case '-':
 				c = read();
 				switch (c) {
-				case '-': return new Token("--");
-				case '=': return new Token("-=");
+				case '-': return operator("--");
+				case '=': return operator("-=");
 				default:
 					unread(c);
-					return new Token("-");
+					return operator("-");
 				}
 			case '.':
-				return new Token(".");
+				return operator(".");
 			case ':':
-				return new Token(":");
+				return operator(":");
 			case ';':
-				return new Token(";");
+				return operator(";");
 			case '<':
 				c = read();
 				switch (c) {
 				case '<':
-					return ifThenElse('=', "<<=", "<<");
+					return operator(ifThenElse('=', "<<=", "<<"));
 				case '=':
-					return new Token("<=");
+					return operator("<=");
 				default:
 					unread(c);
-					return new Token("<");
+					return operator("<");
 				}
 			case '=':
-				return ifThenElse('=', "==", "=");
+				return operator(ifThenElse('=', "==", "="));
 			case '>':
 				c = read();
 				switch (c) {
@@ -91,58 +91,58 @@ public class Lexer {
 					c = read();
 					switch (c) {
 					case '>':
-						return ifThenElse('=', ">>>=", ">>>");
+						return operator(ifThenElse('=', ">>>=", ">>>"));
 					case '=':
-						return new Token(">>=");
+						return operator(">>=");
 					default:
 						unread(c);
-						return new Token(">>");
+						return operator(">>");
 					}
 				case '=':
-					return new Token(">=");
+					return operator(">=");
 				default:
 					unread(c);
-					return new Token(">");
+					return operator(">");
 				}
 			case '?':
-				return new Token("?");
+				return operator("?");
 			case '%':
-				return ifThenElse('=', "%=", "%");
+				return operator(ifThenElse('=', "%=", "%"));
 			case '&':
 				c = read();
 				switch (c) {
 				case '&':
-					return new Token("&&");
+					return operator("&&");
 				case '=':
-					return new Token("&=");
+					return operator("&=");
 				default:
 					unread(c);
-					return new Token("&");
+					return operator("&");
 				}
 			case '[':
-				return new Token("[");
+				return operator("[");
 			case ']':
-				return new Token("]");
+				return operator("]");
 			case '^':
-				return ifThenElse('=', "^=", "^");
+				return operator(ifThenElse('=', "^=", "^"));
 			case '{':
-				return new Token("{");
+				return operator("{");
 			case '}':
-				return new Token("}");
+				return operator("}");
 			case '~':
-				return new Token("~");
+				return operator("~");
 			case '|':
 				c = read();
 				switch (c) {
 				case '|':
-					return new Token("||");
+					return operator("||");
 				case '=':
-					return new Token("|=");
+					return operator("|=");
 				default:
 					unread(c);
-					return new Token("|");
+					return operator("|");
 				}
-			case -1: return null; /*return new Token("EOF");*/
+			case -1: return eof(); /*return new Token("EOF");*/
 			default:
 				if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_') {
 					return lexIdentifier(c);
@@ -180,7 +180,7 @@ public class Lexer {
 			}
 			else {
 				unread(c);
-				return new Token(name.toString());
+				return identifier(name.toString());
 			}
 		}
 	}
@@ -189,7 +189,7 @@ public class Lexer {
 		StringBuffer name = new StringBuffer();
 		name.append((char) c);
 		if (c == '0') {
-			return new Token(name.toString());
+			return integerLiteral(name.toString());
 		}
 		else {
 			while (true) {
@@ -199,7 +199,7 @@ public class Lexer {
 				}
 				else {
 					unread(c);
-					return new Token(name.toString());
+					return integerLiteral(name.toString());
 				}
 			}
 		}
@@ -213,10 +213,30 @@ public class Lexer {
 		_reader.unread(c);
 	}
 
-	private Token ifThenElse(int c, String t1, String t2) throws IOException {
+	private String ifThenElse(int c, String t1, String t2) throws IOException {
 		int n = read();
-		if (n == c) return new Token(t1);
+		if (n == c) return t1;
 		else unread(n);
-		return new Token(t2);
+		return t2;
+	}
+
+        private Token keyword(String s) {
+	    return new Keyword(s);
+        }
+
+        private Token operator(String s) {
+            return new Operator(s);
+        }
+
+        private Token identifier(String s) {
+	    return new Identifier(s);
+        }
+
+	private Token integerLiteral(String s) {
+	    return new Token(s);
+	}
+
+	private Token eof() {
+	    return new Eof();
 	}
 }
