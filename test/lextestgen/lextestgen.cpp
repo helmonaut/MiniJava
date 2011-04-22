@@ -4,9 +4,9 @@
 #include <vector>
 #include <set>
 
-const int ExpressionSkipProbability=4;
-const int ExpressionRecursionSoftLimit=3;
-const int StatementRecursionSoftLimit=3;
+const int ExpressionSkipProbability=3;
+const int ExpressionRecursionSoftLimit=30;
+const int StatementRecursionSoftLimit=30;
 const bool SanerWhitespaces=false;
 
 
@@ -543,7 +543,7 @@ void genMainMethod(){
   emit("void");
   genIdent();
   emit("(");
-  emit("String");
+  emit("identifier String", "String");
   emit("[");
   emit("]");
   genIdent();
