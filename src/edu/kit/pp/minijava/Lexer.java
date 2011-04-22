@@ -1,9 +1,12 @@
+// vi:ai:noet sta sw=4 ts=4 sts=0
 package edu.kit.pp.minijava;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
+
+
 
 public class Lexer {
 	private PushbackReader _reader;
@@ -33,6 +36,7 @@ public class Lexer {
 					unread(c);
 					return new Token("/");
 				}
+				break;
 			case '!':
 				return ifThenElse('=', "!=", "!");
 			case '(':
