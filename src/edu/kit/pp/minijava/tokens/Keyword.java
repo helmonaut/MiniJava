@@ -71,6 +71,6 @@ public class Keyword extends Token {
     }
 
     public String toString() {
-	return "keyword " + _value;
+	return _value;
     }
 }
