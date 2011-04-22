@@ -233,7 +233,7 @@ public class Lexer {
         }
 
 	private Token integerLiteral(String s) {
-	    return new Token(s);
+	    return new IntegerLiteral(s);
 	}
 
 	private Token eof() {
