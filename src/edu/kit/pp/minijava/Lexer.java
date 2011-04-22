@@ -180,6 +180,9 @@ public class Lexer {
 			}
 			else {
 				unread(c);
+				if(Keyword._KEYWORDS.containsKey(name.toString())) {
+					return keyword(name.toString());
+				}
 				return identifier(name.toString());
 			}
 		}
