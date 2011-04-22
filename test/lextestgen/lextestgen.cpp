@@ -18,7 +18,7 @@ std::set<std::string> KeywordSet;
 
 const int OperatorCount = 46;
 
-std::string Operators[] = {"!=", "!", "(", ")", "*=", "*", "++", "+=", "+", ",", "-=", "--", "-", ".", "/=", "/", ":", ";", "«=", "«", "<=", "<", "==", "=", ">=", "»=", "»>=", "»>", "»", ">", "?", "%=", "%", "&=", "&&", "&", "[", "]", "^=", "^", "{", "}", "~", "|=", "||", "|"};
+std::string Operators[] = {"!=", "!", "(", ")", "*=", "*", "++", "+=", "+", ",", "-=", "--", "-", ".", "/=", "/", ":", ";", "<<=", "<<", "<=", "<", "==", "=", ">=", ">>=", ">>>=", ">>>", ">>", ">", "?", "%=", "%", "&=", "&&", "&", "[", "]", "^=", "^", "{", "}", "~", "|=", "||", "|"};
 
 char IdentStartChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 char IdentChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
