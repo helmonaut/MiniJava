@@ -4,9 +4,9 @@
 #include <vector>
 #include <set>
 
-const int ExpressionSkipProbability=3;
-const int ExpressionRecursionSoftLimit=30;
-const int StatementRecursionSoftLimit=30;
+const int ExpressionSkipProbability=2;
+const int ExpressionRecursionSoftLimit=150;
+const int StatementRecursionSoftLimit=150;
 const bool SanerWhitespaces=false;
 
 
