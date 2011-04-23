@@ -35,7 +35,7 @@ void emitComment(){
 
     SourceOutput<<c;
     
-    if(c=='*'){
+    while(c=='*'){
       do c=rand()%256; while (c=='/');
       SourceOutput<<c;
     }
