@@ -1,3 +1,4 @@
+// vi:ai:noet sta sw=4 ts=4 sts=0
 package edu.kit.pp.minijava;
 
 import edu.kit.pp.minijava.tokens.Token;
