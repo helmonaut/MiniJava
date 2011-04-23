@@ -142,7 +142,7 @@ public class Lexer {
 					unread(c);
 					return operator("|");
 				}
-			case -1: return eof(); /*return new Token("EOF");*/
+			case -1: return eof();
 			default:
 				if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_') {
 					return lexIdentifier(c);
@@ -151,7 +151,7 @@ public class Lexer {
 					return lexInteger(c);
 				}
 				else {
-					return new Token("MIST");
+					return error();
 				}
 			}
 		}
@@ -243,5 +243,9 @@ public class Lexer {
 
 	private Token eof() {
 	    return new Eof();
+	}
+
+	private Token error() {
+	    return new edu.kit.pp.minijava.tokens.Error();
 	}
 }
