@@ -4,9 +4,9 @@
 #include <vector>
 #include <set>
 
-const int ExpressionSkipProbability=2;
-const int ExpressionRecursionSoftLimit=150;
-const int StatementRecursionSoftLimit=150;
+const int ExpressionSkipProbability=10;
+const int ExpressionRecursionSoftLimit=10;
+const int StatementRecursionSoftLimit=25;
 const bool SanerWhitespaces=false;
 
 
@@ -30,7 +30,7 @@ std::ostream& TokenOutput = std::cerr;
 void emitComment(){
   SourceOutput << "/*";
 
-  while(rand()%50) {
+  while(rand()%10) {
     char c=rand()%256;
 
     SourceOutput<<c;
@@ -51,7 +51,7 @@ void emitWhitespace()
     return;
   }
 
-  if(!(rand()%10)) emitComment();
+  if(!(rand()%50)) emitComment();
 
   switch (rand()%4) {
     case 0:
@@ -176,7 +176,7 @@ void genArguments(){
   
   genExpresssion();
 
-  while(rand()%3){
+  while(rand()%2){
     emit(",");
     genExpresssion();
   }
@@ -269,7 +269,7 @@ void genPrimaryExpression(){
 
 void genPostfixExpression(){
   genPrimaryExpression();
-  while(rand()%3) genPostfixOp();
+  while(rand()%2) genPostfixOp();
 }
 
 // UnaryExpression → PostfixExpression | (! | -) UnaryExpression
@@ -504,7 +504,7 @@ void genBlockStatement(){
 
 void genBlock(){
   emit("{");
-  while(rand()%20) genBlockStatement();
+  while(rand()%5) genBlockStatement();
   emit("}");
 }
 
@@ -623,7 +623,7 @@ void genClassDeclaration(){
   genIdent();
   emit("{");
 
-  while(rand()%10) genClassMember();
+  while(rand()%5) genClassMember();
 
   emit("}");  
 }
