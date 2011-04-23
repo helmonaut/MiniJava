@@ -15,4 +15,8 @@ public class Token {
 	public boolean isEof() {
 	    return false;
 	}
+
+	public String getValue() {
+	    return _value;
+	}
 }
