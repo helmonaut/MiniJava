@@ -27,12 +27,31 @@ std::ostream& SourceOutput = std::cout;
 
 std::ostream& TokenOutput = std::cerr;
 
+void emitComment(){
+  SourceOutput << "/*";
+
+  while(rand()%50) {
+    char c=rand()%256;
+
+    SourceOutput<<c;
+    
+    if(c=='*'){
+      do c=rand()%256; while (c=='/');
+      SourceOutput<<c;
+    }
+  }
+
+  SourceOutput << "*/";
+}
+
 void emitWhitespace()
 {
   if(SanerWhitespaces){
     SourceOutput << " ";
     return;
   }
+
+  if(!(rand()%10)) emitComment();
 
   switch (rand()%4) {
     case 0:
@@ -49,7 +68,7 @@ void emitWhitespace()
       break;
     }  
 
-  while(rand()%5) switch (rand()%4) {
+  while(rand()%5) switch (rand()%5) {
     case 0:
       SourceOutput << " ";
       break;
@@ -61,6 +80,9 @@ void emitWhitespace()
       break;
     case 3:
       SourceOutput << "\t";
+      break;
+    case 4:
+      if(!(rand()%10)) emitComment();
       break;
     }  
 }
@@ -366,10 +388,12 @@ void genExpresssion(){
   ExpressionDepth++;
   if( (ExpressionDepth>ExpressionRecursionSoftLimit) && (rand()%(ExpressionDepth-ExpressionRecursionSoftLimit)) ){
     emit("null");
+    ExpressionDepth--;
     return;
   }
 
   genAssignmentExpression();
+  ExpressionDepth--;
 }
 
 // ReturnStatement → return Expression? ;
@@ -440,6 +464,7 @@ void genStatement(){
 
   if( (StatementDepth > StatementRecursionSoftLimit) && (rand()%(StatementDepth-StatementRecursionSoftLimit)) ) {
     emit(";");
+    StatementDepth--;
     return;
   }
 
@@ -465,6 +490,7 @@ void genStatement(){
     genReturnStatement();
     break;
   }
+  StatementDepth--;
 }
 
 // BlockStatement → Statement | LocalVariableDeclarationStatement
