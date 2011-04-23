@@ -225,27 +225,27 @@ public class Lexer {
 		return t2;
 	}
 
-        private Token keyword(String s) {
-	    return new Keyword(s);
-        }
+	private Token keyword(String s) {
+		return new Keyword(s);
+	}
 
-        private Token operator(String s) {
-            return new Operator(s);
-        }
+	private Token operator(String s) {
+		return new Operator(s);
+	}
 
-        private Token identifier(String s) {
-	    return new Identifier(s);
-        }
+	private Token identifier(String s) {
+		return new Identifier(s);
+	}
 
 	private Token integerLiteral(String s) {
-	    return new IntegerLiteral(s);
+		return new IntegerLiteral(s);
 	}
 
 	private Token eof() {
-	    return new Eof();
+		return new Eof();
 	}
 
 	private Token error() {
-	    return new edu.kit.pp.minijava.tokens.Error();
+		return new edu.kit.pp.minijava.tokens.Error();
 	}
 }

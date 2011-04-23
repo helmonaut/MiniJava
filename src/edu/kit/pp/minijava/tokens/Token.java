@@ -13,10 +13,10 @@ public class Token {
 	}
 
 	public boolean isEof() {
-	    return false;
+		return false;
 	}
 
 	public String getValue() {
-	    return _value;
+		return _value;
 	}
 }
