@@ -1,6 +1,5 @@
 package edu.kit.pp.minijava;
 
-import edu.kit.pp.minijava.tokens.Identifier;
 import java.io.IOException;
 import java.io.StringReader;
 import org.junit.After;
@@ -48,6 +47,19 @@ public class LexerTest {
     @Test
     public void shouldOutputError() throws Exception {
 	setupLexer("@");
+	assertTrue(_lexer.next() instanceof edu.kit.pp.minijava.tokens.Error);
+    }
+
+    @Test
+    public void shouldNotAllowIntegersWithLeadingZeros() throws Exception {
+	setupLexer("012");
+	assertTrue(_lexer.next() instanceof edu.kit.pp.minijava.tokens.Error);
+
+    }
+
+    @Test
+    public void shouldNotAllowIdentifiersWithLeadingZeros() throws Exception {
+	setupLexer("0variable");
 	assertTrue(_lexer.next() instanceof edu.kit.pp.minijava.tokens.Error);
     }
 
