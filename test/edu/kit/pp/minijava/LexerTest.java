@@ -45,8 +45,8 @@ public class LexerTest {
 	}
 
 	@Test
-	public void shouldOutputError() throws Exception {
-		setupLexer("@");
+	public void shouldOutputErrorForNonAsciiCharacters() throws Exception {
+		setupLexer("∞");
 		assertTrue(_lexer.next() instanceof edu.kit.pp.minijava.tokens.Error);
 	}
 

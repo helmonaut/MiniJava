@@ -144,10 +144,10 @@ public class Lexer {
 				}
 			case -1: return eof();
 			default:
-				if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_') {
+				if (isLetter(c) || c == '_') {
 					return lexIdentifier(c);
 				}
-				else if (c >= '0' && c <= '9') {
+				else if (isDigit(c)) {
 					return lexInteger(c);
 				}
 				else {
@@ -177,7 +177,7 @@ public class Lexer {
 		name.append((char) c);
 		while (true) {
 			c = read();
-			if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_' || (c >= '0' && c <= '9')) {
+			if (isLetter(c) || c == '_' || isDigit(c)) {
 				name.append((char) c);
 			}
 			else {
@@ -194,12 +194,18 @@ public class Lexer {
 		StringBuffer name = new StringBuffer();
 		name.append((char) c);
 		if (c == '0') {
-			return integerLiteral(name.toString());
+			c = read();
+			if (isDigit(c) || isLetter(c) || c == '_')
+			    return error();
+			else {
+			    unread(c);
+			    return integerLiteral(name.toString());
+			}
 		}
 		else {
 			while (true) {
 				c = read();
-				if (c >= '0' && c <= '9') {
+				if (isDigit(c)) {
 					name.append((char) c);
 				}
 				else {
@@ -223,6 +229,14 @@ public class Lexer {
 		if (n == c) return t1;
 		else unread(n);
 		return t2;
+	}
+
+	private boolean isDigit(int c) {
+	    return c >= '0' && c <= '9';
+	}
+
+	private boolean isLetter(int c) {
+	    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 	}
 
 	private Token keyword(String s) {
