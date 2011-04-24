@@ -3,7 +3,7 @@
 #
 
 dir=`dirname $PWD/$0`
-source="$dir/$1.java"
+source="$dir/$1.mj"
 tokens="$dir/$1.tok"
 
 
