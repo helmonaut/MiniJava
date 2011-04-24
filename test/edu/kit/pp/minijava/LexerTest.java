@@ -11,8 +11,6 @@ import static org.junit.Assert.*;
 
 public class LexerTest {
 
-	private Lexer _lexer;
-
 	public LexerTest() {
 	}
 
@@ -34,35 +32,27 @@ public class LexerTest {
 
 	@Test
 	public void shouldHandleCommentsWithStars() throws Exception {
-		setupLexer("/**\n Comment over multiple * lines.\n**/");
-		assertTrue(_lexer.next().isEof());
+		assertTrue(createLexer("/**\n Comment over multiple * lines.\n**/").next().isEof());
 	}
 
 	@Test
-	public void shouldNotIgnorePartsAfterCommentsWithStars()throws Exception {
-		setupLexer("/*\n**/class");
-		assertEquals(_lexer.next().getValue(), "class");
+	public void shouldNotIgnorePartsAfterCommentsWithStars() throws Exception {
+		assertEquals("class", createLexer("/*\n**/class").next().getValue());
 	}
 
 	@Test
-	public void shouldOutputErrorForNonAsciiCharacters() throws Exception {
-		setupLexer("∞");
-		assertTrue(_lexer.next() instanceof edu.kit.pp.minijava.tokens.Error);
+	public void shouldOutputErrorGivenNonAsciiCharacters() throws Exception {
+		assertTrue(createLexer("∞").next() instanceof edu.kit.pp.minijava.tokens.Error);
 	}
 
 	@Test
 	public void shouldNotAllowIntegersWithLeadingZeros() throws Exception {
-		setupLexer("012");
-		assertTrue(_lexer.next() instanceof edu.kit.pp.minijava.tokens.Error);
+		Lexer lexer = createLexer("012");
+		assertEquals("0", lexer.next().getValue());
+		assertEquals("12", lexer.next().getValue());
 	}
 
-	@Test
-	public void shouldNotAllowIdentifiersWithLeadingZeros() throws Exception {
-		setupLexer("0variable");
-		assertTrue(_lexer.next() instanceof edu.kit.pp.minijava.tokens.Error);
-	}
-
-	private void setupLexer(String s) throws IOException {
-		_lexer = new Lexer(new StringReader(s));
+	private Lexer createLexer(String input) throws IOException {
+		return new Lexer(new StringReader(input));
 	}
 }

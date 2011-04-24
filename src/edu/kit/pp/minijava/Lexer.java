@@ -194,13 +194,7 @@ public class Lexer {
 		StringBuffer name = new StringBuffer();
 		name.append((char) c);
 		if (c == '0') {
-			c = read();
-			if (isDigit(c) || isLetter(c) || c == '_')
-			    return error();
-			else {
-			    unread(c);
-			    return integerLiteral(name.toString());
-			}
+			return integerLiteral(name.toString());
 		}
 		else {
 			while (true) {
