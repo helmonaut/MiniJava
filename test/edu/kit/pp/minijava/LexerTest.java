@@ -53,15 +53,6 @@ public class LexerTest {
 		assertEquals("0", lexer.next().getValue());
 		assertEquals("12", lexer.next().getValue());
 	}
-	
-	@Test
-	public void shouldNotLexNumbersAndLettersWithoutWhitespace() throws IOException {
-		Lexer lexer= createLexer("012ABC456_DEF789");
-		Token t= lexer.next();
-		assertEquals("error", t.getValue());
-		t= lexer.next();
-		assertEquals(null, t);
-	}
 
 	private Lexer createLexer(String input) throws IOException {
 		return new Lexer(new StringReader(input));
