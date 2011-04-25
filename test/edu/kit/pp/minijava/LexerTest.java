@@ -7,6 +7,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import edu.kit.pp.minijava.tokens.Token;
 import static org.junit.Assert.*;
 
 public class LexerTest {
@@ -50,6 +52,15 @@ public class LexerTest {
 		Lexer lexer = createLexer("012");
 		assertEquals("0", lexer.next().getValue());
 		assertEquals("12", lexer.next().getValue());
+	}
+	
+	@Test
+	public void shouldNotLexNumbersAndLettersWithoutWhitespace() throws IOException {
+		Lexer lexer= createLexer("012ABC456_DEF789");
+		Token t= lexer.next();
+		assertEquals("error", t.getValue());
+		t= lexer.next();
+		assertEquals(null, t);
 	}
 
 	private Lexer createLexer(String input) throws IOException {
