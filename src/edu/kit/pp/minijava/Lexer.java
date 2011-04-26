@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
+import java.util.zip.CRC32;
 
 
 public class Lexer {
@@ -202,7 +203,9 @@ public class Lexer {
 				if (isDigit(c)) {
 					name.append((char) c);
 				}
-				else {
+				else if(isLetter(c)) {
+					return error();
+				} else {
 					unread(c);
 					return integerLiteral(name.toString());
 				}
