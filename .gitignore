@@ -2,6 +2,6 @@
 *.class
 
 # Netbeans stuff
-nbproject/
+nbproject/private
 build/
 dist/
