@@ -16,6 +16,11 @@ public class Token {
 		return false;
 	}
 
+	public boolean isIdentifier() {
+		return false;
+		
+	}
+
 	public String getValue() {
 		return _value;
 	}

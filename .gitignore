@@ -5,3 +5,5 @@
 nbproject/private
 build/
 dist/
+test/lextestgen/lextestgen
+test/lextestgen/.deps/

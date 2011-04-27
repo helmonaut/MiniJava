@@ -10,4 +10,8 @@ public class Identifier extends Token {
 	public String toString() {
 		return "identifier " + _value;
 	}
+
+	public boolean isIdentifier() {
+		return true;
+	}
 }
