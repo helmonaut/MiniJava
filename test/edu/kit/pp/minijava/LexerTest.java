@@ -1,5 +1,6 @@
 package edu.kit.pp.minijava;
 
+import edu.kit.pp.minijava.tokens.*;
 import java.io.IOException;
 import java.io.StringReader;
 import org.junit.After;
@@ -52,6 +53,13 @@ public class LexerTest {
 		Lexer lexer = createLexer("012");
 		assertEquals("0", lexer.next().getValue());
 		assertEquals("12", lexer.next().getValue());
+	}
+
+	@Test
+	public void shouldAccecptSingleOperator() throws Exception {
+		Lexer lexer = createLexer("=");
+		assertTrue(lexer.next() instanceof Operator);
+		assertTrue(lexer.next() instanceof Eof);
 	}
 
 	private Lexer createLexer(String input) throws IOException {

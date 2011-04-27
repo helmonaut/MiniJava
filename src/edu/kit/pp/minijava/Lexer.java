@@ -17,7 +17,7 @@ public class Lexer {
 
 	public Token next() throws IOException {
 		while (true) {
-			int c = read();
+			int c = (short) read();
 			switch (c) {
 			case ' ':
 			case '\n':
