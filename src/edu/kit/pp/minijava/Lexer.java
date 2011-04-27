@@ -17,7 +17,7 @@ public class Lexer {
 
 	public Token next() throws IOException {
 		while (true) {
-			int c = (short) read();
+			int c = read();
 			switch (c) {
 			case ' ':
 			case '\n':
@@ -210,7 +210,7 @@ public class Lexer {
 	}
 
 	private int read() throws IOException {
-		return _reader.read();
+		return (short)_reader.read();
 	}
 
 	private void unread(int c) throws IOException {

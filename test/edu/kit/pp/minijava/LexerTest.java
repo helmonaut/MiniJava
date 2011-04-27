@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.kit.pp.minijava.tokens.Token;
 import static org.junit.Assert.*;
 
 public class LexerTest {
