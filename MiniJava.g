@@ -16,7 +16,7 @@ Parameters: Parameter | Parameter ',' Parameters;
 
 Parameter: Type IDENT;
 
-Type: BasicType ('[' ']')?;
+Type: BasicType ('[' ']') *;
 
 BasicType: 'int' | 'boolean' | 'void' | IDENT;
 
@@ -38,7 +38,7 @@ EmptyStatement: ';';
 
 WhileStatement: 'while' '(' Expression ')' Statement ;
 
-IfStatement: 'if' '(' Expression ')' Statement ('(' 'else' Statement')')? ;
+IfStatement: 'if' '(' Expression ')' Statement ('else' Statement)? ;
 
 ExpressionStatement: Expression ';' ;
 
@@ -46,22 +46,19 @@ ReturnStatement: 'return' Expression? ';' ;
 
 Expression: AssignmentExpression ;
 
-AssignmentExpression: LogicalOrExpression ('(' '=' AssignmentExpression')')? ;
+AssignmentExpression: LogicalOrExpression ('=' AssignmentExpression)? ;
 
-LogicalOrExpression: ('('LogicalOrExpression '||' ')')? LogicalAndExpression ;
+LogicalOrExpression: (LogicalOrExpression '||')? LogicalAndExpression ;
 
-LogicalAndExpression: ('('LogicalAndExpression '&&' ')')? EqualityExpression ;
+LogicalAndExpression: (LogicalAndExpression '&&')? EqualityExpression ;
 
-EqualityExpression: ( '(' EqualityExpression '(' '==' | '!=' ')' )? RelationalExpression;
+EqualityExpression: (EqualityExpression ( '==' | '!=' ) )? RelationalExpression;
 
-RelationalExpression: 	( 	'('RelationalExpression ('<' | '<=' | '>' | '>=') ')' 
-			)? AdditiveExpression ;
+RelationalExpression: (RelationalExpression ('<' | '<=' | '>' | '>='))? AdditiveExpression ;
 
-AdditiveExpression: 	(	AdditiveExpression ('+'|'-')
-			)? MultiplicativeExpression ;
+AdditiveExpression: (AdditiveExpression ('+'|'-'))? MultiplicativeExpression ;
 
-MultiplicativeExpression: 	(	MultiplicativeExpression ('*'| '/' | '%')
-				)? UnaryExpression ;
+MultiplicativeExpression: (MultiplicativeExpression ('*' |  '/' | '%'))? UnaryExpression ;
 
 UnaryExpression: PostfixExpression | ('!'|'-') UnaryExpression ;
 
@@ -93,7 +90,7 @@ PrimaryExpression: 'null'
 
 NewObjectExpression: 'new' IDENT '(' ')' ;
 
-NewArrayExpression: 'new' BasicType '[' Expression ']' ( '(' '[' ']' ')' )* ;
+NewArrayExpression: 'new' BasicType '[' Expression ']' ('[' ']')* ;
 
 IDENT: ('_' |'a'..'z' | 'A'..'Z')+ ;
 INTEGER_LITERAL: ('0'..'9')+ ;
