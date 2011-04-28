@@ -14,7 +14,7 @@ public class FixedQueue<T> {
 		_items = new ArrayList<T>(size);
 	}
 
-	public void add(T item) {
+	public void push(T item) {
 		if (_items.size() == _size) {
 			_items.add(0, item);
 			_items.remove(_size);

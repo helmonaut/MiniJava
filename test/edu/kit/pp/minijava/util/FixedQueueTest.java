@@ -33,34 +33,34 @@ public class FixedQueueTest {
 
 	@Test
 	public void addShouldAddItemsToTheBeginning() {
-		_queue.add(4);
+		_queue.push(4);
 		assertEquals(4, (int)_queue.get(0));
-		_queue.add(5);
+		_queue.push(5);
 		assertEquals(5, (int)_queue.get(0));
 	}
 
 	@Test
 	public void addShouldMoveItemsToTheEnd() {
-		_queue.add(4);
-		_queue.add(5);
+		_queue.push(4);
+		_queue.push(5);
 		assertEquals(4, (int)_queue.get(1));
 	}
 
 	@Test(expected=Exception.class)
 	public void shouldNotSaveMoreThan3Items() {
-		_queue.add(4);
-		_queue.add(5);
-		_queue.add(6);
-		_queue.add(7);
+		_queue.push(4);
+		_queue.push(5);
+		_queue.push(6);
+		_queue.push(7);
 		_queue.get(3);
 	}
 
 	@Test
 	public void addShouldKickOldValuesOut() {
-		_queue.add(4);
-		_queue.add(5);
-		_queue.add(6);
-		_queue.add(7);
+		_queue.push(4);
+		_queue.push(5);
+		_queue.push(6);
+		_queue.push(7);
 		assertEquals(5, (int)_queue.get(2));
 	}
 }
