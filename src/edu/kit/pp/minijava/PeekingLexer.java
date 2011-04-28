@@ -24,6 +24,8 @@ class PeekingLexer {
 		Token result = _lookAhead[_pos % _size];
 		_lookAhead[_pos % _size] = _lexer.next();
 		_pos += 1;
+		if (_pos >= _size)
+			_pos = 0;
 		return result;
 	}
 

@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class Parser {
 	public static class UnexpectedTokenException extends Exception {
 		private Token _token;
-		
+
 		public UnexpectedTokenException(Token token) {
 			_token = token;
 		}
@@ -23,7 +23,7 @@ public class Parser {
 		public static abstract class ParseExpressionPrefixFunction{
 			ASTNode parse() throws UnexpectedTokenException{return new ASTNode();};
 		}
-		
+
 		public static abstract class ParseExpressionInfixFunction{
 			ASTNode parse(ASTNode left) throws UnexpectedTokenException{return left;};
 		}
@@ -31,7 +31,7 @@ public class Parser {
 		public ParseExpressionPrefixFunction _parseExpressionPrefixFunction;
 		public int _precedence;
 		public ParseExpressionInfixFunction _parseExpressionInfixFunction;
-		
+
 		ParserFunction(int p, ParseExpressionPrefixFunction f, ParseExpressionInfixFunction inf){
 			_parseExpressionPrefixFunction=f;
 			_precedence=p;
@@ -39,12 +39,10 @@ public class Parser {
 		}
 	}
 
-	private Lexer _lexer;
+	private PeekingLexer _lexer;
 	private static final int LOOK_AHEAD_SIZE=4;
-	private Token[] _lookAheadBuffer;
-	private int _lookAheadBufferIndex;
 	private HashMap<String, ParserFunction> _expressionParsers;
-	
+
 	private void initalizeExpressionParserMap(){
 		_expressionParsers=new HashMap();
 
@@ -60,44 +58,34 @@ public class Parser {
 													   ));
 	}
 
-	public Parser(Lexer lexer) {
-		_lexer=lexer;		
-		_lookAheadBuffer=new Token[LOOK_AHEAD_SIZE];
-		for(int i=0;i<LOOK_AHEAD_SIZE;i++) consumeToken();
+	public Parser(Lexer lexer) throws IOException {
+		_lexer = new PeekingLexer(lexer, LOOK_AHEAD_SIZE);
 
 		initalizeExpressionParserMap();
 	}
 
 	private void consumeToken() {
-		try{
-			_lookAheadBuffer[(_lookAheadBufferIndex)%LOOK_AHEAD_SIZE]=_lexer.next();
+		try {
+			_lexer.next();
 		} catch (IOException e) {
-			_lookAheadBuffer[(_lookAheadBufferIndex)%LOOK_AHEAD_SIZE]=new Eof();	
-		}			
-
-		_lookAheadBufferIndex++;
-		
-		if(_lookAheadBufferIndex>=LOOK_AHEAD_SIZE) _lookAheadBufferIndex=0;
+			System.out.println("Wir müssen was gegen diese IOException-Flut tun :/");
+		}
 	}
 
-	private Token lookAhead(int k) {
-		return _lookAheadBuffer[(k+_lookAheadBufferIndex)%LOOK_AHEAD_SIZE];
-	}
-	
 	private Token getCurrentToken() {
-		return lookAhead(0);
+		return _lexer.peek(0);
 	}
 
 	private boolean acceptToken(String s, int pos){
-		return lookAhead(pos).toString().equals(s);
+		return _lexer.peek(pos).toString().equals(s);
 	}
 
 	private boolean acceptToken(String s){
 		return acceptToken(s,0);
 	}
-	
+
 	private void expectToken(String s) throws UnexpectedTokenException {
-		if(!acceptToken(s)) throw new UnexpectedTokenException(getCurrentToken());		
+		if(!acceptToken(s)) throw new UnexpectedTokenException(getCurrentToken());
 		consumeToken();
 	}
 
@@ -124,7 +112,7 @@ public class Parser {
 			if(pf==null) break;// throw new UnexpectedTokenException(getCurrentToken());
 
 			if(pf._parseExpressionInfixFunction == null  || pf._precedence < precedence) break;
-			
+
 			left=pf._parseExpressionInfixFunction.parse(left);
 		}
 
@@ -136,7 +124,7 @@ public class Parser {
 		expectToken(";");
 		return new ASTNode();
 	}
-	
+
 	private ASTNode parseBlockStatement() throws UnexpectedTokenException {
 		parseExpressionStatement();
 		return new ASTNode();
@@ -160,7 +148,7 @@ public class Parser {
 
 		return new ASTNode();
 	}
-	
+
 	private ASTNode parseMainMethod() throws UnexpectedTokenException {
 		return new ASTNode();
 	}
@@ -173,7 +161,7 @@ public class Parser {
 		parseParameters();
 		expectToken(")");
 		parseBlock();
-		
+
 		return new ASTNode();
 	}
 
@@ -191,8 +179,8 @@ public class Parser {
 		if(acceptToken(";",3)) parseField();
 		else if(acceptToken("(",3)) parseMethod();
 		else parseMainMethod();
-		
-		return new ASTNode();		
+
+		return new ASTNode();
 	}
 
 	private ASTNode parseClass() throws UnexpectedTokenException {
@@ -207,18 +195,18 @@ public class Parser {
 		expectToken("}");
 
 		return new ASTNode();
-	}	
+	}
 
 	public ASTNode parseProgram() throws UnexpectedTokenException {
 		//		consumeToken();
 
 		while(!acceptToken("EOF")) {
 			consumeToken();
-			parseClass();			
+			parseClass();
 		}
 
 		expectToken("EOF");
-		
+
 		return new ASTNode();
 	}
 }
