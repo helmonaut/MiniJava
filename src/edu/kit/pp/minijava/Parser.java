@@ -44,7 +44,7 @@ public class Parser {
 	private HashMap<String, ParserFunction> _expressionParsers;
 
 	private void initalizeExpressionParserMap(){
-		_expressionParsers=new HashMap();
+		_expressionParsers=new HashMap<String, ParserFunction>();
 
 		_expressionParsers.put("+", new ParserFunction(0,
 													   null,
@@ -82,6 +82,10 @@ public class Parser {
 
 	private boolean acceptToken(String s){
 		return acceptToken(s,0);
+	}
+	
+	private boolean acceptIdentifier() {
+		return getCurrentToken().isIdentifier();
 	}
 
 	private void expectToken(String s) throws UnexpectedTokenException {
@@ -144,19 +148,38 @@ public class Parser {
 	}
 
 	private ASTNode parseType() throws UnexpectedTokenException {
-		expectToken("void");
-
+		if(	!acceptToken("void")	&&
+			!acceptToken("int")		&&
+			!acceptToken("boolean") &&
+			!acceptIdentifier()		) {
+			throw new UnexpectedTokenException(getCurrentToken());
+		}
+		consumeToken();
+		while(acceptToken("[") && acceptToken("]", 1)) {
+			consumeToken();
+			consumeToken();
+		}
+		if(acceptToken("[")) {
+			throw new UnexpectedTokenException(getCurrentToken());
+		}
 		return new ASTNode();
 	}
 
 	private ASTNode parseMainMethod() throws UnexpectedTokenException {
-		return new ASTNode();
+		expectToken("static");
+		expectToken("void");
+		expectIdentifier();
+		expectToken("(");
+		expectToken("String");
+		expectToken("[");
+		expectToken("]");
+		expectIdentifier();
+		expectToken(")");
+		return parseBlock();
+		// return new ASTNode();
 	}
 
 	private ASTNode parseMethod() throws UnexpectedTokenException {
-		expectToken("public");
-		parseType();
-		expectIdentifier();
 		expectToken("(");
 		parseParameters();
 		expectToken(")");
@@ -176,9 +199,22 @@ public class Parser {
 	}
 
 	private ASTNode parseClassMember() throws UnexpectedTokenException {
-		if(acceptToken(";",3)) parseField();
-		else if(acceptToken("(",3)) parseMethod();
-		else parseMainMethod();
+		expectToken("public");
+		if( acceptToken("static", 1) /* &&
+			acceptToken("void", 2)	 &&
+				acceptToken("main", 3) */) {
+			parseMainMethod();
+		} else {
+			parseType();
+			expectIdentifier();
+			// Field
+			if(acceptToken(";")) {
+				consumeToken();
+			// Method
+			} else {
+				return parseMethod();
+			}
+		}
 
 		return new ASTNode();
 	}
@@ -201,7 +237,8 @@ public class Parser {
 		//		consumeToken();
 
 		while(!acceptToken("EOF")) {
-			consumeToken();
+			// consumeToken();
+			expectToken("class");
 			parseClass();
 		}
 
