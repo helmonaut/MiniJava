@@ -3,8 +3,8 @@ package edu.kit.pp.minijava.tokens;
 
 public class IntegerLiteral extends Token {
 
-	public IntegerLiteral(String value) {
-		super(value);
+	public IntegerLiteral(long crcval, String value) {
+		super(crcval, value);
 	}
 
 	public String toString() {

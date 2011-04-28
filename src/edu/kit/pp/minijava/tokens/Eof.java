@@ -4,7 +4,7 @@ package edu.kit.pp.minijava.tokens;
 public class Eof extends Token {
 
 	public Eof() {
-		super("");
+		super(0, "");
 	}
 
 	public String toString() {
