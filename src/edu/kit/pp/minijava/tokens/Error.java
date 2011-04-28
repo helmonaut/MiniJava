@@ -3,7 +3,7 @@ package edu.kit.pp.minijava.tokens;
 public class Error extends Token {
 
 	public Error() {
-		super(-1, "");
+		super("");
 	}
 
 	public String toString() {
