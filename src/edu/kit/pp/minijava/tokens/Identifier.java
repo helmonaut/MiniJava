@@ -9,6 +9,7 @@ public class Identifier extends Token {
 
     private static HashMap<HashValue, LinkedList<Identifier>> _Identifiers = new HashMap<HashValue, LinkedList<Identifier>>();
     private int _id;
+    private static boolean _hashCollision = false;
 
     public Identifier(long crcval, String value) {
         super(crcval, value);
@@ -35,11 +36,33 @@ public class Identifier extends Token {
             }
         }
         
+        _hashCollision = true;
+        
         // add new identifier
         id = new Identifier(crcval, value);
         idList.add(id);
         return id;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Identifier other = (Identifier) obj;
+        if(!_hashval.equals(other._hashval)) return false;
+        if(! _hashCollision) return true;
+        return _value.equals(other._value);
+    }
+
+    @Override
+    public int hashCode() {
+        return _hashval.hashCode();
+    }
+
 
     public String toString() {
         return "identifier " + _value;
