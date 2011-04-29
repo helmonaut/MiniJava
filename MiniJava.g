@@ -8,7 +8,7 @@ ClassMember: Field | Method | MainMethod;
 
 Field: 'public' Type IDENT ';';
 
-MainMethod: 'public' 'static' 'void' IDENT '(' 'String' '[' ']' IDENT ')' Block;
+MainMethod: 'public static void' IDENT '(' 'String' '[' ']' IDENT ')' Block;
 
 Method: 'public' Type IDENT '(' Parameters? ')' Block;
 
@@ -16,11 +16,13 @@ Parameters: Parameter | Parameter ',' Parameters;
 
 Parameter: Type IDENT;
 
-Type: BasicType ('[' ']') *;
+Type: BasicType ('[' ']')* ;
 
 BasicType: 'int' | 'boolean' | 'void' | IDENT;
 
-Statement: Block
+//rule Statement has non-LL(*) decision due to recursive rule invocations reachable from alts 3,4.  
+//Resolve by left-factoring or using syntactic predicates or using backtrack=true option.
+Statement: 	  Block
 	| EmptyStatement
 	| IfStatement
 	| ExpressionStatement
@@ -30,35 +32,38 @@ Statement: Block
 
 Block: '{' BlockStatement* '}';
 
-BlockStatement: Statement | LocalVariableDeclarationStatement;
+//rule BlockStatement has non-LL(*) decision due to recursive rule invocations reachable from alts 1,2.  
+//Resolve by left-factoring or using syntactic predicates or using backtrack=true option.
+BlockStatement: Statement 
+	| LocalVariableDeclarationStatement;
 
-LocalVariableDeclarationStatement: Type IDENT ('=' Expression)? ';';
+LocalVariableDeclarationStatement: Type IDENT ('=' AssignmentExpression)? ';';
 
 EmptyStatement: ';';
 
-WhileStatement: 'while' '(' Expression ')' Statement ;
+WhileStatement: 'while' '(' AssignmentExpression ')' Statement ;
 
-IfStatement: 'if' '(' Expression ')' Statement ('else' Statement)? ;
+IfStatement: 'if' '(' AssignmentExpression ')' Statement ('else' Statement)? ;
 
-ExpressionStatement: Expression ';' ;
+ExpressionStatement: AssignmentExpression ';' ;
 
-ReturnStatement: 'return' Expression? ';' ;
+ReturnStatement: 'return' AssignmentExpression? ';' ;
 
-Expression: AssignmentExpression ;
+//Expression: AssignmentExpression ;
 
-AssignmentExpression: LogicalOrExpression ('=' AssignmentExpression)? ;
+AssignmentExpression: 	LogicalOrExpression ('=' AssignmentExpression)? 	;
 
-LogicalOrExpression: (LogicalOrExpression '||')? LogicalAndExpression ;
+LogicalOrExpression: LogicalAndExpression ('||' LogicalOrExpression)? ;
 
-LogicalAndExpression: (LogicalAndExpression '&&')? EqualityExpression ;
+LogicalAndExpression: EqualityExpression ('&&' LogicalAndExpression )? ;
 
-EqualityExpression: (EqualityExpression ( '==' | '!=' ) )? RelationalExpression;
+EqualityExpression: RelationalExpression (( '==' | '!=' ) EqualityExpression )? ;
 
-RelationalExpression: (RelationalExpression ('<' | '<=' | '>' | '>='))? AdditiveExpression ;
+RelationalExpression: AdditiveExpression (('<' | '<=' | '>' | '>=') RelationalExpression )? ;
 
-AdditiveExpression: (AdditiveExpression ('+'|'-'))? MultiplicativeExpression ;
+AdditiveExpression: MultiplicativeExpression (('+'|'-') AdditiveExpression)? ;
 
-MultiplicativeExpression: (MultiplicativeExpression ('*' |  '/' | '%'))? UnaryExpression ;
+MultiplicativeExpression: UnaryExpression (('*' |  '/' | '%') MultiplicativeExpression)? ;
 
 UnaryExpression: PostfixExpression | ('!'|'-') UnaryExpression ;
 
@@ -72,9 +77,9 @@ PostfixOp: MethodInvocation
 MethodInvocation: '.' IDENT '(' Arguments ')';
 
 FieldAccess: '.' IDENT ;
-ArrayAccess: '[' Expression ']' ;
+ArrayAccess: '[' AssignmentExpression ']' ;
 
-Arguments: (Expression (',' Expression)*)? ;
+Arguments: (AssignmentExpression (',' AssignmentExpression)*)? ;
 
 PrimaryExpression: 'null'
 	| 'false'
@@ -83,14 +88,14 @@ PrimaryExpression: 'null'
 	| IDENT
 	| IDENT '(' Arguments ')'
 	| 'this'
-	| '(' Expression ')'
+	| '(' AssignmentExpression ')'
 	| NewObjectExpression
 	| NewArrayExpression
 	;
 
 NewObjectExpression: 'new' IDENT '(' ')' ;
 
-NewArrayExpression: 'new' BasicType '[' Expression ']' ('[' ']')* ;
+NewArrayExpression: 'new' BasicType '[' AssignmentExpression ']' ('[' ']')* ;
 
 IDENT: ('_' |'a'..'z' | 'A'..'Z')+ ;
 INTEGER_LITERAL: ('0'..'9')+ ;
