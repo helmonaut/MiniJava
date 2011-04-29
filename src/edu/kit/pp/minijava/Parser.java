@@ -1,6 +1,6 @@
 package edu.kit.pp.minijava;
 
-import edu.kit.pp.minijava.ast.ASTNode;
+import edu.kit.pp.minijava.ast.Node;
 import edu.kit.pp.minijava.tokens.Token;
 import edu.kit.pp.minijava.tokens.Eof;
 import java.io.IOException;
@@ -21,11 +21,11 @@ public class Parser {
 
 	private static class ParserFunction {
 		public static abstract class ParseExpressionPrefixFunction{
-			ASTNode parse() throws UnexpectedTokenException{return new ASTNode();};
+			Node parse() throws UnexpectedTokenException{return new Node();};
 		}
 
 		public static abstract class ParseExpressionInfixFunction{
-			ASTNode parse(ASTNode left) throws UnexpectedTokenException{return left;};
+			Node parse(Node left) throws UnexpectedTokenException{return left;};
 		}
 
 		public ParseExpressionPrefixFunction _parseExpressionPrefixFunction;
@@ -49,10 +49,10 @@ public class Parser {
 		_expressionParsers.put("+", new ParserFunction(0,
 													   null,
 													   new ParserFunction.ParseExpressionInfixFunction(){
-														   ASTNode parse(ASTNode left) throws UnexpectedTokenException{
+														   Node parse(Node left) throws UnexpectedTokenException{
 															   expectToken("+");
 															   parseExpression(1);
-															   return new ASTNode();
+															   return new Node();
 														   }
 													   }
 													   ));
@@ -83,7 +83,7 @@ public class Parser {
 	private boolean acceptToken(String s){
 		return acceptToken(s,0);
 	}
-	
+
 	private boolean acceptIdentifier() {
 		return getCurrentToken().isIdentifier();
 	}
@@ -98,14 +98,14 @@ public class Parser {
 		consumeToken();
 	}
 
-	private ASTNode parsePrimaryExpression() throws UnexpectedTokenException{
+	private Node parsePrimaryExpression() throws UnexpectedTokenException{
 		expectToken("integer literal 23");
-		return new ASTNode();
+		return new Node();
 	}
 
-	private ASTNode parseExpression(int precedence) throws UnexpectedTokenException {
+	private Node parseExpression(int precedence) throws UnexpectedTokenException {
 		ParserFunction pf=_expressionParsers.get(getCurrentToken().toString());
-		ASTNode left;
+		Node left;
 
 		if(pf!=null && pf._parseExpressionPrefixFunction!=null) left=pf._parseExpressionPrefixFunction.parse();
 		else left=parsePrimaryExpression();
@@ -120,34 +120,34 @@ public class Parser {
 			left=pf._parseExpressionInfixFunction.parse(left);
 		}
 
-		return new ASTNode();
+		return new Node();
 	}
 
-	private ASTNode parseExpressionStatement() throws UnexpectedTokenException {
+	private Node parseExpressionStatement() throws UnexpectedTokenException {
 		parseExpression(0);
 		expectToken(";");
-		return new ASTNode();
+		return new Node();
 	}
 
-	private ASTNode parseBlockStatement() throws UnexpectedTokenException {
+	private Node parseBlockStatement() throws UnexpectedTokenException {
 		parseExpressionStatement();
-		return new ASTNode();
+		return new Node();
 	}
 
-	private ASTNode parseBlock() throws UnexpectedTokenException {
+	private Node parseBlock() throws UnexpectedTokenException {
 		expectToken("{");
 		while(!acceptToken("}")){
 			parseBlockStatement();
 		}
 		expectToken("}");
-		return new ASTNode();
+		return new Node();
 	}
 
-	private ASTNode parseParameters() throws UnexpectedTokenException {
-		return new ASTNode();
+	private Node parseParameters() throws UnexpectedTokenException {
+		return new Node();
 	}
 
-	private ASTNode parseType() throws UnexpectedTokenException {
+	private Node parseType() throws UnexpectedTokenException {
 		if(	!acceptToken("void")	&&
 			!acceptToken("int")		&&
 			!acceptToken("boolean") &&
@@ -162,10 +162,10 @@ public class Parser {
 		if(acceptToken("[")) {
 			throw new UnexpectedTokenException(getCurrentToken());
 		}
-		return new ASTNode();
+		return new Node();
 	}
 
-	private ASTNode parseMainMethod() throws UnexpectedTokenException {
+	private Node parseMainMethod() throws UnexpectedTokenException {
 		expectToken("static");
 		expectToken("void");
 		expectIdentifier();
@@ -179,26 +179,26 @@ public class Parser {
 		// return new ASTNode();
 	}
 
-	private ASTNode parseMethod() throws UnexpectedTokenException {
+	private Node parseMethod() throws UnexpectedTokenException {
 		expectToken("(");
 		parseParameters();
 		expectToken(")");
 		parseBlock();
 
-		return new ASTNode();
+		return new Node();
 	}
 
 
-	private ASTNode parseField() throws UnexpectedTokenException {
+	private Node parseField() throws UnexpectedTokenException {
 		expectToken("public");
 		parseType();
 		expectIdentifier();
 		expectToken(";");
 
-		return new ASTNode();
+		return new Node();
 	}
 
-	private ASTNode parseClassMember() throws UnexpectedTokenException {
+	private Node parseClassMember() throws UnexpectedTokenException {
 		expectToken("public");
 		if( acceptToken("static", 1) /* &&
 			acceptToken("void", 2)	 &&
@@ -216,10 +216,10 @@ public class Parser {
 			}
 		}
 
-		return new ASTNode();
+		return new Node();
 	}
 
-	private ASTNode parseClass() throws UnexpectedTokenException {
+	private Node parseClass() throws UnexpectedTokenException {
 		expectIdentifier();
 
 		expectToken("{");
@@ -230,10 +230,10 @@ public class Parser {
 
 		expectToken("}");
 
-		return new ASTNode();
+		return new Node();
 	}
 
-	public ASTNode parseProgram() throws UnexpectedTokenException {
+	public Node parseProgram() throws UnexpectedTokenException {
 		//		consumeToken();
 
 		while(!acceptToken("EOF")) {
@@ -244,6 +244,6 @@ public class Parser {
 
 		expectToken("EOF");
 
-		return new ASTNode();
+		return new Node();
 	}
 }
