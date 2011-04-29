@@ -40,6 +40,55 @@ public class ParserTest {
 			fail("Did throw UnexpectedTokenException");
 		}
 	}
+	
+	@Test
+	public void parseShouldFailIfNoClass() throws Exception {
+		Parser p = createParserFromTokensWithEOF(K("ssalc"), I("Muh"), O("{"), O("}"));
+		try {
+			p.parseProgram();
+			fail("Did accept program without class.");
+		} catch (Parser.UnexpectedTokenException e) {
+			
+		}
+	}
+	
+	@Test
+	public void parseSimpleClassWithField() throws Exception {
+		Parser p = createParserFromTokensWithEOF(
+				K("class"), I("Muh"), O("{"), 
+				K("public"), I("String"), I("name"), O(";"), O("}"));
+		try {
+			p.parseProgram();		
+		} catch (Parser.UnexpectedTokenException e) {
+			fail("Did not accept valid program with class field.");
+		}
+	}
+	
+	@Test
+	public void parseSimpleClassWithInvalidField1() throws Exception {
+		Parser p = createParserFromTokensWithEOF(
+				K("class"), I("Muh"), O("{"), 
+				K("public"), I("String"), O("]"), O("]"), I("name"), O(";"), O("}"));
+		try {
+			p.parseProgram();	
+			fail("Did accept program with invalid class field.");
+		} catch (Parser.UnexpectedTokenException e) {
+			
+		}
+	}
+	
+	@Test
+	public void parseSimpleClassWithInvalidField2() throws Exception {
+		Parser p = createParserFromTokensWithEOF(
+				K("class"), I("Muh"), O("{"), 
+				K("public"), I("String"), O("["), O("["), I("name"), O(";"), O("}"));
+		try {
+			p.parseProgram();	
+			fail("Did accept program with invalid class field.");
+		} catch (Parser.UnexpectedTokenException e) {
+			
+		}
+	}
 
 	private Parser createParserFromTokens(Token ... tokens) throws Exception {
 		Lexer l = mock(Lexer.class);
