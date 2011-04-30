@@ -3,9 +3,9 @@
  * @author Beate Best
  */
 class classic {
-    public int method(int arg) {
-	int res = arg+42;
-	res >>= 4;
-	return res;
-    }
+	public int method(int arg) {
+		int res = arg+42;
+		res = 4*12;
+		return res;
+		}
 }
