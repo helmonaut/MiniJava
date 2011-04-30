@@ -4,7 +4,7 @@ import edu.kit.pp.minijava.tokens.Identifier;
 
 public class NewObjectExpression extends Expression {
 
-	public NewObjectExpression(Identifier t) {
-		super(t);
+	public NewObjectExpression(Identifier className) {
+		super(className);
 	}
 }

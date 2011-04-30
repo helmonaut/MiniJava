@@ -397,6 +397,54 @@ public class Parser {
 		return left;
 	}
 
+	private PostfixOp parsePostfixOp() {
+		if (acceptToken(".")) {
+			if (acceptToken("(", 2)) {
+				return parseMethodInvocation();
+			} else {
+				return parseFieldAccess();
+			}
+		}
+		else if (acceptToken("[")) {
+			return parseArrayAccess();
+		}
+		throw new UnexpectedTokenException(getCurrentToken());
+	}
+
+	private MethodInvocation parseMethodInvocation() {
+		expectToken(".");
+		Identifier name = expectIdentifier();
+		expectToken("(");
+		Arguments a = parseArguments();
+		expectToken(")");
+		return new MethodInvocation(name, a);
+	}
+
+	private FieldAccess parseFieldAccess() {
+		expectToken(".");
+		Identifier name = expectIdentifier();
+		return new FieldAccess(name);
+	}
+
+	private ArrayAccess parseArrayAccess() {
+		expectToken("[");
+		Expression e = parseExpression();
+		expectToken("]");
+		return new ArrayAccess(e);
+	}
+
+	private Arguments parseArguments() {
+		Arguments a = new Arguments();
+		while (!acceptToken(")")) {
+			a.add(parseExpression());
+			if (acceptToken(")"))
+				break;
+			else
+				expectToken(",");
+		}
+		return a;
+	}
+
 	private Expression parsePrimaryExpression() {
 		if (acceptToken("null"))
 			return new PrimaryExpression(expectToken("null"));
@@ -422,11 +470,7 @@ public class Parser {
 		}
 		else if (acceptToken("new")) {
 			if (acceptToken("(", 2)) {
-				expectToken("new");
-				Identifier t = expectIdentifier();
-				expectToken("(");
-				expectToken(")");
-				return new NewObjectExpression(t);
+				return parseNewObjectExpression();
 			}
 			else if (acceptToken("[", 2)) {
 				return parseNewArrayExpression();
@@ -453,6 +497,14 @@ public class Parser {
 		return new NewArrayExpression(bt, e, fieldCount);
 	}
 
+	private NewObjectExpression parseNewObjectExpression() {
+		expectToken("new");
+		Identifier className = expectIdentifier();
+		expectToken("(");
+		expectToken(")");
+		return new NewObjectExpression(className);
+	}
+
 	private LocalMethodInvocationExpression parseLocalMethodInvocation() {
 		Token t = expectIdentifier();
 		expectToken("(");
@@ -460,20 +512,4 @@ public class Parser {
 		expectToken(")");
 		return new LocalMethodInvocationExpression(t, a);
 	}
-
-	private Arguments parseArguments() {
-		Arguments a = new Arguments();
-		while (!acceptToken(")")) {
-			a.add(parseExpression());
-			if (acceptToken(")"))
-				break;
-			else
-				expectToken(",");
-		}
-		return a;
-	}
-
-
-
-
 }
