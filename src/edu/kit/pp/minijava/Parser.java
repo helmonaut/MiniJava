@@ -362,9 +362,11 @@ public class Parser {
 			expectToken(";");
 			return new ReturnStatement(null);
 		}
-		else { // TODO check for primary expression. "{" should already throw an error
+		else if (acceptPrimaryExpression()) {
 			return new ReturnStatement(parseExpression());
 		}
+		else
+			throw new UnexpectedTokenException(getCurrentToken());
 	}
 
 	public Expression parseExpression() {
