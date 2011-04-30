@@ -315,8 +315,10 @@ public class Parser {
 		Type t = parseType();
 		Identifier name = expectIdentifier();
 		Expression e = null;
-		if (acceptToken("="))
+		if (acceptToken("=")) {
+			expectToken("=");
 			e = parseExpression();
+		}
 		expectToken(";");
 		return new LocalVariableDeclarationStatement(t, name, e);
 	}
