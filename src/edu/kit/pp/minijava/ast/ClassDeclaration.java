@@ -1,6 +1,7 @@
 package edu.kit.pp.minijava.ast;
 
 import edu.kit.pp.minijava.tokens.Identifier;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ClassDeclaration extends Node {
@@ -10,6 +11,7 @@ public class ClassDeclaration extends Node {
 
 	public ClassDeclaration(Identifier name) {
 		_name = name;
+		_members = new LinkedList<ClassMember>();
 	}
 
 	public void add(ClassMember member) {
