@@ -5,6 +5,8 @@ import edu.kit.pp.minijava.tokens.*;
 import java.io.IOException;
 import java.util.HashMap;
 // TODO  delete throws UnexpectedToken...
+// TODO error() method for throwing Exception
+// TODO alle expressions durchgehen und tokens so speziell wie möglich wählen
 
 public class Parser {
 
@@ -127,78 +129,139 @@ public class Parser {
 		return getCurrentToken() instanceof Identifier;
 	}
 
+	private boolean acceptPrimaryExpression() {
+		return acceptToken("null") || acceptToken("false") || acceptToken("true") ||
+				acceptIdentifier() || acceptIntegerLiteral() || acceptToken("this") ||
+				acceptToken("(") || acceptToken("new");
+	}
+
 	private Token expectToken(String s) throws UnexpectedTokenException {
 		if (!acceptToken(s))
 			throw new UnexpectedTokenException(getCurrentToken());
 		return consumeToken();
 	}
 
-	private Token expectIntegerLiteral() throws UnexpectedTokenException {
+	private IntegerLiteral expectIntegerLiteral() throws UnexpectedTokenException {
 		if (!(getCurrentToken() instanceof IntegerLiteral))
 			throw new UnexpectedTokenException(getCurrentToken());
-		return consumeToken();
+		return (IntegerLiteral)consumeToken();
 	}
 
-	private Token expectIdentifier() throws UnexpectedTokenException {
+	private Identifier expectIdentifier() throws UnexpectedTokenException {
 		if (!(getCurrentToken() instanceof Identifier))
+			throw new UnexpectedTokenException(getCurrentToken());
+		return (Identifier)consumeToken();
+	}
+
+	private Token expectEOF() {
+		if (!getCurrentToken().isEof())
 			throw new UnexpectedTokenException(getCurrentToken());
 		return consumeToken();
 	}
 
-	private Expression parsePrimaryExpression() throws UnexpectedTokenException {
-		if (acceptToken("null"))
-			return new PrimaryExpression(expectToken("null"));
-		else if (acceptToken("false"))
-			return new PrimaryExpression(expectToken("false"));
-		else if (acceptToken("true"))
-			return new PrimaryExpression(expectToken("true"));
-		else if (acceptIntegerLiteral())
-			return new PrimaryExpression(expectIntegerLiteral());
-		else if (acceptIdentifier()) {
-			if (acceptToken("(", 1)) {
-				return parseLocalMethodInvocation();
-			}
-			return new PrimaryExpression(expectIdentifier());
-		}
-		else if (acceptToken("this"))
-			return new PrimaryExpression(expectToken("this"));
-		else if (acceptToken("(")) {
-			expectToken("(");
-			Expression e = parseExpression(0);
-			expectToken(")");
-			return e;
-		}
-		else if (acceptToken("new")) {
-			if (acceptToken("(", 2)) {
-				expectToken("new");
-				Token t = expectIdentifier();
-				expectToken("(");
-				expectToken(")");
-				return new NewObjectExpression(t);
-			}
-			else if (acceptToken("[", 2)) {
-				return parseNewArrayExpression();
-			}
+	public Node parseProgram() throws UnexpectedTokenException {
+		Program p = new Program();
+
+		while (acceptToken("class")) {
+			p.add(parseClass());
 		}
 
-		throw new UnexpectedTokenException(getCurrentToken());
+		expectEOF();
+
+		return p;
 	}
 
-	private NewArrayExpression parseNewArrayExpression() {
-		expectToken("new");
-		BasicType bt = parseBasicType();
-		expectToken("[");
-		Expression e = parseExpression();
-		expectToken("]");
+	private ClassDeclaration parseClass() throws UnexpectedTokenException {
+		expectToken("class");
+		Identifier name = expectIdentifier();
+		expectToken("{");
+		ClassDeclaration cd = new ClassDeclaration(name);
+		while (acceptToken("public")) {
+			cd.add(parseClassMember());
+		}
+		expectToken("}");
+		return cd;
+	}
 
-		int fieldCount = 1;
+	private ClassMember parseClassMember() throws UnexpectedTokenException {
+		if (acceptToken("public")) {
+			if (acceptToken("static", 1)) {
+				return parseMainMethod();
+			}
+			else if (acceptToken(";", 3)) { // TODO how to differ between field and method?
+				return parseField();
+			}
+			else {
+				return parseMethod();
+			}
+		}
+		else {
+			throw new UnexpectedTokenException(getCurrentToken());
+		}
+	}
+
+	private Field parseField() throws UnexpectedTokenException {
+		expectToken("public");
+		Type t = parseType();
+		Identifier id = expectIdentifier();
+		expectToken(";");
+		return new Field(t, id);
+	}
+
+	private MainMethod parseMainMethod() throws UnexpectedTokenException {
+		expectToken("public");
+		expectToken("static");
+		expectToken("void");
+		Identifier name = expectIdentifier();
+		expectToken("(");
+		expectToken("String");
+		expectToken("[");
+		expectToken("]");
+		Identifier variableName = expectIdentifier();
+		expectToken(")");
+		Block b = parseBlock();
+		return new MainMethod(name, variableName, b);
+	}
+
+	private Method parseMethod() throws UnexpectedTokenException {
+		expectToken("public");
+		Type type = parseType();
+		Identifier name = expectIdentifier();
+		expectToken("(");
+		Parameters p = null;
+		if (!acceptToken(")"))
+			p = parseParameters();
+		expectToken(")");
+		Block b = parseBlock();
+		return new Method(type, name, b, p);
+	}
+
+	// TODO So richtig?
+	private Parameters parseParameters() throws UnexpectedTokenException {
+		Parameters p = new Parameters();
+		p.add(parseParameter());
+		while (acceptToken(",")) {
+			expectToken(",");
+			p.add(parseParameter());
+		}
+		return p;
+	}
+
+	private Parameter parseParameter() {
+		Type t = parseType();
+		Identifier name = expectIdentifier();
+		return new Parameter(t, name);
+	}
+
+	private Type parseType() throws UnexpectedTokenException {
+		BasicType t = parseBasicType();
+		int dimension = 0;
 		while (acceptToken("[")) {
 			expectToken("[");
 			expectToken("]");
-			fieldCount += 1;
+			dimension += 1;
 		}
-
-		return new NewArrayExpression(bt, e, fieldCount);
+		return new Type(t, dimension);
 	}
 
 	private BasicType parseBasicType() {
@@ -213,24 +276,94 @@ public class Parser {
 		throw new UnexpectedTokenException(getCurrentToken());
 	}
 
-	private LocalMethodInvocationExpression parseLocalMethodInvocation() throws UnexpectedTokenException {
-		Token t = expectIdentifier();
-		expectToken("(");
-		Arguments a = parseArguments();
-		expectToken(")");
-		return new LocalMethodInvocationExpression(t, a);
+	private Statement parseStatement() {
+		if (acceptToken("{"))
+			return parseBlock();
+		else if (acceptToken(";"))
+			return parseEmptyStatement();
+		else if (acceptToken("if"))
+			return parseIfStatement();
+		else if (acceptToken("while"))
+			return parseWhileStatement();
+		else if (acceptToken("return"))
+			return parseReturnStatement();
+		else if (acceptPrimaryExpression()) // we could also just ignore the check
+			return parseExpressionStatement();
+
+		throw new UnexpectedTokenException(getCurrentToken());
 	}
 
-	private Arguments parseArguments() throws UnexpectedTokenException {
-		Arguments a = new Arguments();
-		while (!acceptToken(")")) {
-			a.add(parseExpression());
-			if (acceptToken(")"))
-				break;
-			else
-				expectToken(",");
+	// TODO so korrekt?
+	private Block parseBlock() throws UnexpectedTokenException {
+		expectToken("{");
+		while(!acceptToken("}")) {
+			parseBlockStatement();
 		}
-		return a;
+		expectToken("}");
+		return new Block();
+	}
+
+	private BlockStatement parseBlockStatement() throws UnexpectedTokenException {
+		if (acceptToken("{") || acceptToken(";") || acceptPrimaryExpression() ||
+				acceptToken("if") || acceptToken("while") || acceptToken("return")) {
+			return parseStatement();
+		} else { // TODO meeeh
+			return parseLocalVariableDeclarationStatement();
+		}
+	}
+
+	private LocalVariableDeclarationStatement parseLocalVariableDeclarationStatement() {
+		Type t = parseType();
+		Identifier name = expectIdentifier();
+		Expression e = null;
+		if (acceptToken("="))
+			e = parseExpression();
+		expectToken(";");
+		return new LocalVariableDeclarationStatement(t, name, e);
+	}
+
+	private EmptyStatement parseEmptyStatement() {
+		expectToken(";");
+		return new EmptyStatement();
+	}
+
+	private WhileStatement parseWhileStatement() {
+		expectToken("while");
+		expectToken("(");
+		Expression e = parseExpression();
+		expectToken(")");
+		Statement s = parseStatement();
+		return new WhileStatement(e, s);
+	}
+
+	private IfStatement parseIfStatement() {
+		expectToken("if");
+		expectToken("(");
+		Expression e = parseExpression();
+		Statement s1 = parseStatement();
+		Statement s2 = null;
+		if (acceptToken("else")) {
+			expectToken("else");
+			s2 = parseStatement();
+		}
+		return new IfStatement(e, s1, s2);
+	}
+
+	private ExpressionStatement parseExpressionStatement() throws UnexpectedTokenException {
+		Expression e = parseExpression();
+		expectToken(";");
+		return new ExpressionStatement(e);
+	}
+
+	private ReturnStatement parseReturnStatement() {
+		expectToken("return");
+		if (acceptToken(";")) {
+			expectToken(";");
+			return new ReturnStatement(null);
+		}
+		else { // TODO check for primary expression. "{" should already throw an error
+			return new ReturnStatement(parseExpression());
+		}
 	}
 
 	public Expression parseExpression() throws UnexpectedTokenException {
@@ -261,124 +394,83 @@ public class Parser {
 		return left;
 	}
 
-	private Node parseExpressionStatement() throws UnexpectedTokenException {
-		parseExpression(0);
-		expectToken(";");
-		return new Node();
-	}
-
-	private Node parseBlockStatement() throws UnexpectedTokenException {
-		parseExpressionStatement();
-		return new Node();
-	}
-
-	private Node parseBlock() throws UnexpectedTokenException {
-		expectToken("{");
-		while(!acceptToken("}")){
-			parseBlockStatement();
+	private Expression parsePrimaryExpression() throws UnexpectedTokenException {
+		if (acceptToken("null"))
+			return new PrimaryExpression(expectToken("null"));
+		else if (acceptToken("false"))
+			return new PrimaryExpression(expectToken("false"));
+		else if (acceptToken("true"))
+			return new PrimaryExpression(expectToken("true"));
+		else if (acceptIntegerLiteral())
+			return new PrimaryExpression(expectIntegerLiteral());
+		else if (acceptIdentifier()) {
+			if (acceptToken("(", 1)) {
+				return parseLocalMethodInvocation();
+			}
+			return new PrimaryExpression(expectIdentifier());
 		}
-		expectToken("}");
-		return new Node();
-	}
-
-	private Node parseParameters() throws UnexpectedTokenException {
-		return new Node();
-	}
-
-	private Node parseType() throws UnexpectedTokenException {
-		if (	!acceptToken("void")	&&
-			!acceptToken("int")		&&
-			!acceptToken("boolean") &&
-			!acceptIdentifier()		) {
-			throw new UnexpectedTokenException(getCurrentToken());
+		else if (acceptToken("this"))
+			return new PrimaryExpression(expectToken("this"));
+		else if (acceptToken("(")) {
+			expectToken("(");
+			Expression e = parseExpression();
+			expectToken(")");
+			return e;
 		}
-		consumeToken();
-		while (acceptToken("[") && acceptToken("]", 1)) {
-			consumeToken();
-			consumeToken();
-		}
-		if (acceptToken("[")) {
-			throw new UnexpectedTokenException(getCurrentToken());
-		}
-		return new Node();
-	}
-
-	private Node parseMainMethod() throws UnexpectedTokenException {
-		expectToken("static");
-		expectToken("void");
-		expectIdentifier();
-		expectToken("(");
-		expectToken("String");
-		expectToken("[");
-		expectToken("]");
-		expectIdentifier();
-		expectToken(")");
-		return parseBlock();
-	}
-
-	private Node parseMethod() throws UnexpectedTokenException {
-		expectToken("(");
-		parseParameters();
-		expectToken(")");
-		parseBlock();
-		return new Node();
-	}
-
-
-	private Node parseField() throws UnexpectedTokenException {
-		expectToken("public");
-		parseType();
-		expectIdentifier();
-		expectToken(";");
-		return new Node();
-	}
-
-	private Node parseClassMember() throws UnexpectedTokenException {
-		expectToken("public");
-		if( acceptToken("static", 1) /* &&
-			acceptToken("void", 2)	 &&
-				acceptToken("main", 3) */) {
-			parseMainMethod();
-		} else {
-			parseType();
-			expectIdentifier();
-			// Field
-			if(acceptToken(";")) {
-				consumeToken();
-			// Method
-			} else {
-				return parseMethod();
+		else if (acceptToken("new")) {
+			if (acceptToken("(", 2)) {
+				expectToken("new");
+				Identifier t = expectIdentifier();
+				expectToken("(");
+				expectToken(")");
+				return new NewObjectExpression(t);
+			}
+			else if (acceptToken("[", 2)) {
+				return parseNewArrayExpression();
 			}
 		}
 
-		return new Node();
+		throw new UnexpectedTokenException(getCurrentToken());
 	}
 
-	private Node parseClass() throws UnexpectedTokenException {
-		expectIdentifier();
+	private NewArrayExpression parseNewArrayExpression() {
+		expectToken("new");
+		BasicType bt = parseBasicType();
+		expectToken("[");
+		Expression e = parseExpression();
+		expectToken("]");
 
-		expectToken("{");
-
-		while(!acceptToken("}")){
-			parseClassMember();
+		int fieldCount = 1;
+		while (acceptToken("[")) {
+			expectToken("[");
+			expectToken("]");
+			fieldCount += 1;
 		}
 
-		expectToken("}");
-
-		return new Node();
+		return new NewArrayExpression(bt, e, fieldCount);
 	}
 
-	public Node parseProgram() throws UnexpectedTokenException {
-		//		consumeToken();
+	private LocalMethodInvocationExpression parseLocalMethodInvocation() throws UnexpectedTokenException {
+		Token t = expectIdentifier();
+		expectToken("(");
+		Arguments a = parseArguments();
+		expectToken(")");
+		return new LocalMethodInvocationExpression(t, a);
+	}
 
-		while(!acceptToken("EOF")) {
-			// consumeToken();
-			expectToken("class");
-			parseClass();
+	private Arguments parseArguments() throws UnexpectedTokenException {
+		Arguments a = new Arguments();
+		while (!acceptToken(")")) {
+			a.add(parseExpression());
+			if (acceptToken(")"))
+				break;
+			else
+				expectToken(",");
 		}
-
-		expectToken("EOF");
-
-		return new Node();
+		return a;
 	}
+
+
+
+
 }
