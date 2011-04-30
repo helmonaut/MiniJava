@@ -1,5 +1,10 @@
 package edu.kit.pp.minijava.ast;
 
-public class NewObjectExpression extends Node {
+import edu.kit.pp.minijava.tokens.Token;
 
+public class NewObjectExpression extends Expression {
+
+	public NewObjectExpression(Token t) {
+		super(t);
+	}
 }

@@ -18,7 +18,6 @@ public class Token {
 
 	public boolean isIdentifier() {
 		return false;
-		
 	}
 
 	public String getValue() {

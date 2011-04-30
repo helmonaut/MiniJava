@@ -1,5 +1,6 @@
 package edu.kit.pp.minijava;
 
+import edu.kit.pp.minijava.ast.*;
 import edu.kit.pp.minijava.tokens.*;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -32,6 +33,28 @@ public class ParserTest {
 	}
 
 	@Test
+	public void parseAdditionExpression() throws Exception {
+		Parser p = createParserFromTokens(I("a"), O("+"), I("b"), O("+"), I("c"));
+		BinaryExpression e = (BinaryExpression) p.parseExpression();
+		assertEquals("+", e.getToken().getValue());
+		assertEquals("+", e.getLeft().getToken().getValue());
+		assertEquals("a", ((BinaryExpression) e.getLeft()).getLeft().getToken().getValue());
+		assertEquals("b", ((BinaryExpression) e.getLeft()).getRight().getToken().getValue());
+		assertEquals("c", e.getRight().getToken().getValue());
+	}
+
+	@Test
+	public void parseAdditionAndMultiplicationExpression() throws Exception {
+		Parser p = createParserFromTokens(I("a"), O("+"), I("b"), O("*"), I("c"));
+		BinaryExpression e = (BinaryExpression) p.parseExpression();
+		assertEquals("+", e.getToken().getValue());
+		assertEquals("a", e.getLeft().getToken().getValue());
+		assertEquals("*", e.getRight().getToken().getValue());
+		assertEquals("b", ((BinaryExpression) e.getRight()).getLeft().getToken().getValue());
+		assertEquals("c", ((BinaryExpression) e.getRight()).getRight().getToken().getValue());
+	}
+
+	@Test
 	public void parseShouldNotThrowExceptionForSimpleTokenStream() throws Exception {
 		Parser p = createParserFromTokensWithEOF(K("class"), I("Muh"), O("{"), O("}"));
 		try {
@@ -40,7 +63,7 @@ public class ParserTest {
 			fail("Did throw UnexpectedTokenException");
 		}
 	}
-	
+
 	@Test
 	public void parseShouldFailIfNoClass() throws Exception {
 		Parser p = createParserFromTokensWithEOF(K("ssalc"), I("Muh"), O("{"), O("}"));
@@ -48,45 +71,45 @@ public class ParserTest {
 			p.parseProgram();
 			fail("Did accept program without class.");
 		} catch (Parser.UnexpectedTokenException e) {
-			
+
 		}
 	}
-	
+
 	@Test
 	public void parseSimpleClassWithField() throws Exception {
 		Parser p = createParserFromTokensWithEOF(
-				K("class"), I("Muh"), O("{"), 
+				K("class"), I("Muh"), O("{"),
 				K("public"), I("String"), I("name"), O(";"), O("}"));
 		try {
-			p.parseProgram();		
+			p.parseProgram();
 		} catch (Parser.UnexpectedTokenException e) {
 			fail("Did not accept valid program with class field.");
 		}
 	}
-	
+
 	@Test
 	public void parseSimpleClassWithInvalidField1() throws Exception {
 		Parser p = createParserFromTokensWithEOF(
-				K("class"), I("Muh"), O("{"), 
+				K("class"), I("Muh"), O("{"),
 				K("public"), I("String"), O("]"), O("]"), I("name"), O(";"), O("}"));
 		try {
-			p.parseProgram();	
+			p.parseProgram();
 			fail("Did accept program with invalid class field.");
 		} catch (Parser.UnexpectedTokenException e) {
-			
+
 		}
 	}
-	
+
 	@Test
 	public void parseSimpleClassWithInvalidField2() throws Exception {
 		Parser p = createParserFromTokensWithEOF(
-				K("class"), I("Muh"), O("{"), 
+				K("class"), I("Muh"), O("{"),
 				K("public"), I("String"), O("["), O("["), I("name"), O(";"), O("}"));
 		try {
-			p.parseProgram();	
+			p.parseProgram();
 			fail("Did accept program with invalid class field.");
 		} catch (Parser.UnexpectedTokenException e) {
-			
+
 		}
 	}
 

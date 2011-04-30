@@ -1,6 +1,19 @@
 package edu.kit.pp.minijava.ast;
 
-// should handle all Expressions (needs left, right, operator)
+import edu.kit.pp.minijava.tokens.Token;
+
 public class Expression extends Node {
 
+	private Token _token;
+
+	public Expression() {
+	}
+
+	public Expression(Token token) {
+		_token = token;
+	}
+
+	public Token getToken() {
+		return _token;
+	}
 }
