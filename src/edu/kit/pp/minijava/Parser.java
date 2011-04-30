@@ -4,7 +4,6 @@ import edu.kit.pp.minijava.ast.*;
 import edu.kit.pp.minijava.tokens.*;
 import java.io.IOException;
 import java.util.HashMap;
-// TODO  delete throws UnexpectedToken...
 // TODO error() method for throwing Exception
 // TODO alle expressions durchgehen und tokens so speziell wie möglich wählen
 
@@ -183,7 +182,7 @@ public class Parser {
 		return cd;
 	}
 
-	private ClassMember parseClassMember() throws UnexpectedTokenException {
+	private ClassMember parseClassMember() {
 		if (acceptToken("public")) {
 			if (acceptToken("static", 1)) {
 				return parseMainMethod();
@@ -208,7 +207,7 @@ public class Parser {
 		return new Field(t, id);
 	}
 
-	private MainMethod parseMainMethod() throws UnexpectedTokenException {
+	private MainMethod parseMainMethod() {
 		expectToken("public");
 		expectToken("static");
 		expectToken("void");
@@ -223,7 +222,7 @@ public class Parser {
 		return new MainMethod(name, variableName, b);
 	}
 
-	private Method parseMethod() throws UnexpectedTokenException {
+	private Method parseMethod() {
 		expectToken("public");
 		Type type = parseType();
 		Identifier name = expectIdentifier();
@@ -237,7 +236,7 @@ public class Parser {
 	}
 
 	// TODO So richtig?
-	private Parameters parseParameters() throws UnexpectedTokenException {
+	private Parameters parseParameters() {
 		Parameters p = new Parameters();
 		p.add(parseParameter());
 		while (acceptToken(",")) {
@@ -253,7 +252,7 @@ public class Parser {
 		return new Parameter(t, name);
 	}
 
-	private Type parseType() throws UnexpectedTokenException {
+	private Type parseType() {
 		BasicType t = parseBasicType();
 		int dimension = 0;
 		while (acceptToken("[")) {
@@ -294,7 +293,7 @@ public class Parser {
 	}
 
 	// TODO so korrekt?
-	private Block parseBlock() throws UnexpectedTokenException {
+	private Block parseBlock() {
 		expectToken("{");
 		while(!acceptToken("}")) {
 			parseBlockStatement();
@@ -303,7 +302,7 @@ public class Parser {
 		return new Block();
 	}
 
-	private BlockStatement parseBlockStatement() throws UnexpectedTokenException {
+	private BlockStatement parseBlockStatement() {
 		if (acceptToken("{") || acceptToken(";") || acceptPrimaryExpression() ||
 				acceptToken("if") || acceptToken("while") || acceptToken("return")) {
 			return parseStatement();
@@ -349,7 +348,7 @@ public class Parser {
 		return new IfStatement(e, s1, s2);
 	}
 
-	private ExpressionStatement parseExpressionStatement() throws UnexpectedTokenException {
+	private ExpressionStatement parseExpressionStatement() {
 		Expression e = parseExpression();
 		expectToken(";");
 		return new ExpressionStatement(e);
@@ -366,11 +365,11 @@ public class Parser {
 		}
 	}
 
-	public Expression parseExpression() throws UnexpectedTokenException {
+	public Expression parseExpression() {
 		return parseExpression(0);
 	}
 
-	public Expression parseExpression(int precedence) throws UnexpectedTokenException {
+	public Expression parseExpression(int precedence) {
 		ParserFunction pf = _expressionParsers.get(getCurrentToken().toString());
 		Expression left;
 
@@ -394,7 +393,7 @@ public class Parser {
 		return left;
 	}
 
-	private Expression parsePrimaryExpression() throws UnexpectedTokenException {
+	private Expression parsePrimaryExpression() {
 		if (acceptToken("null"))
 			return new PrimaryExpression(expectToken("null"));
 		else if (acceptToken("false"))
@@ -450,7 +449,7 @@ public class Parser {
 		return new NewArrayExpression(bt, e, fieldCount);
 	}
 
-	private LocalMethodInvocationExpression parseLocalMethodInvocation() throws UnexpectedTokenException {
+	private LocalMethodInvocationExpression parseLocalMethodInvocation() {
 		Token t = expectIdentifier();
 		expectToken("(");
 		Arguments a = parseArguments();
@@ -458,7 +457,7 @@ public class Parser {
 		return new LocalMethodInvocationExpression(t, a);
 	}
 
-	private Arguments parseArguments() throws UnexpectedTokenException {
+	private Arguments parseArguments() {
 		Arguments a = new Arguments();
 		while (!acceptToken(")")) {
 			a.add(parseExpression());
