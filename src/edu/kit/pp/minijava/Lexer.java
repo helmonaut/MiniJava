@@ -180,6 +180,9 @@ public class Lexer {
 				unread(c);
 				break;
 			case -1: return;
+			case '\n':
+				_line++;
+				_column = 1;
 			default: ;
 			}
 		}

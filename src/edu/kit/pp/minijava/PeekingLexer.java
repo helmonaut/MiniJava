@@ -52,8 +52,8 @@ class PeekingLexer {
 		_currentPos = _lookAheadPos[i];
 		_currentToken = _lookAhead[i];
 		
-		_lookAhead[_pos % _size] = _lexer.next();
-		_lookAheadPos[_pos % _size] = new Position(_lexer.getLine(), _lexer.getColumn());
+		_lookAhead[i] = _lexer.next();
+		_lookAheadPos[i] = new Position(_lexer.getLine(), _lexer.getColumn());
 		
 		_pos += 1;
 		if (_pos >= _size) {
