@@ -1,0 +1,21 @@
+class ifCascade {
+	public void f() {
+		if (a == true)
+			b= false;
+		else
+			b= true;
+
+		if (c == false)
+			if (a= new b() != null) {
+				if (e == true)
+					if (f == false)
+						g= true;
+					else
+						if(1+2 > x)
+							/*some comment*/
+							h= asdf() - 1;
+						else
+							y= asdf() || ghjk();
+			}	
+	}
+}
