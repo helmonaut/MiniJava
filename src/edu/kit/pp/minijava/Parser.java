@@ -342,8 +342,10 @@ public class Parser {
 	}
 
 	private BlockStatement parseBlockStatement() {
-		if (acceptToken("{") || acceptToken(";") || acceptPrimaryExpression() ||
-				acceptToken("if") || acceptToken("while") || acceptToken("return")) {
+		if (acceptToken("{") || acceptToken(";") || acceptToken("if") || 
+				acceptToken("while") || acceptToken("return") || 
+				acceptToken("=", 2) || (acceptToken("[", 1) && !acceptToken("]", 2))) {
+				// acceptPrimaryExpression()) {
 			return parseStatement();
 		} else { // TODO meeeh
 			return parseLocalVariableDeclarationStatement();
