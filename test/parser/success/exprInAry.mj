@@ -1,0 +1,7 @@
+class test01 {
+	public void foo () {
+		int y = 10;
+		int[][] x = new int[100][]/*  */;
+		/* x[7 + 8 * 9][9]; */
+	}
+}

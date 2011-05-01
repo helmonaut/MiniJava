@@ -1,0 +1,14 @@
+class t1 {
+	public boolean m1() {
+		return false;
+	}
+
+	public int m2(int i1, int i2) {
+		if(this.m1()) {
+			return i1;
+		} else {
+			return i2;
+		}
+		return 0;
+	}
+}

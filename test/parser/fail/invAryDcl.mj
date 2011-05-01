@@ -1,0 +1,5 @@
+class t1 {
+	public void m1() {
+		int[][] x = new int[100][100];
+	}
+}
