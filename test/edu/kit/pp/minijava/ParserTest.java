@@ -36,7 +36,7 @@ public class ParserTest {
 	public void parseClassMember() throws Exception {
 		Parser p= createParserFromTokensWithEOF(K("class"), I("classic"), O("{"), 
 				K("public"), K("int"), I("i"), O(";"), 
-				K("public"), K("int"), O("["), O("]"), I("intArray"), O(";"),
+				K("public"), K("int"), O("["), O("]"), O("["), O("]"), I("intArray"), O(";"),
 				O("}"));
 		p.parseProgram();
 	}

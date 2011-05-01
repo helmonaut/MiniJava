@@ -31,6 +31,24 @@ public class LexerTest {
 	@After
 	public void tearDown() {
 	}
+	
+	@Test
+	public void testGetTextPosition3Lines() throws Exception {
+		Lexer lex= createLexer("ab\ncde\nfgh");
+		lex.next();
+		int col= lex.getColumn();
+		int line= lex.getLine();
+		assertTrue(col == 3 && line == 1);
+		lex.next();
+		col= lex.getColumn();
+		line= lex.getLine();
+		assertTrue(col == 4 && line == 2);
+		lex.next();
+		col= lex.getColumn();
+		line= lex.getLine();
+		assertTrue(col == 4 && line == 3);
+	}
+	
 
 	@Test
 	public void shouldHandleCommentsWithStars() throws Exception {
