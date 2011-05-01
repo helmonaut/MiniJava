@@ -12,13 +12,22 @@ public class Parser {
 
 	public static class UnexpectedTokenException extends RuntimeException {
 		private Token _token;
+		private int _line;
+		private int _column;
 
-		public UnexpectedTokenException(Token token) {
-			_token = token;
+		public UnexpectedTokenException(Parser parser) {
+			_token = parser.getCurrentToken();
+			_line = parser.getCurrentLine();
+			_column = parser.getCurrentColumn();
 		}
 
 		public Token getToken() {
 			return _token;
+		}
+
+		@Override
+		public String toString() {
+			return _line + ":" + _column + " '" + _token + "'";
 		}
 	}
 
@@ -50,7 +59,7 @@ public class Parser {
 					}
 				}
 				if (o == null)
-					throw new UnexpectedTokenException(_parser.getCurrentToken());
+					throw new UnexpectedTokenException(_parser);
 				Token t = _parser.expectToken(o);
 				Expression right = _parser.parseExpression(_precedence + 1);
 				return new BinaryExpression(t, left, right);
@@ -113,6 +122,14 @@ public class Parser {
 		return _lexer.peek(0);
 	}
 
+	private int getCurrentLine() {
+		return _lexer.getCurrentLine();
+	}
+
+	private int getCurrentColumn() {
+		return _lexer.getCurrentColumn();
+	}
+
 	private boolean acceptToken(String s, int pos){
 		return _lexer.peek(pos).getValue().equals(s);
 	}
@@ -137,25 +154,25 @@ public class Parser {
 
 	private Token expectToken(String s) throws UnexpectedTokenException {
 		if (!acceptToken(s))
-			throw new UnexpectedTokenException(getCurrentToken());
+			throw new UnexpectedTokenException(this);
 		return consumeToken();
 	}
 
 	private IntegerLiteral expectIntegerLiteral() throws UnexpectedTokenException {
 		if (!(getCurrentToken() instanceof IntegerLiteral))
-			throw new UnexpectedTokenException(getCurrentToken());
+			throw new UnexpectedTokenException(this);
 		return (IntegerLiteral)consumeToken();
 	}
 
 	private Identifier expectIdentifier() throws UnexpectedTokenException {
 		if (!(getCurrentToken() instanceof Identifier))
-			throw new UnexpectedTokenException(getCurrentToken());
+			throw new UnexpectedTokenException(this);
 		return (Identifier)consumeToken();
 	}
 
 	private Token expectEOF() {
 		if (!getCurrentToken().isEof())
-			throw new UnexpectedTokenException(getCurrentToken());
+			throw new UnexpectedTokenException(this);
 		return consumeToken();
 	}
 
@@ -193,7 +210,7 @@ public class Parser {
 			}
 		}
 		else {
-			throw new UnexpectedTokenException(getCurrentToken());
+			throw new UnexpectedTokenException(this);
 		}
 	}
 
@@ -268,7 +285,7 @@ public class Parser {
 			return new BasicType(expectToken("void"));
 		else if (acceptIdentifier())
 			return new BasicType(expectIdentifier());
-		throw new UnexpectedTokenException(getCurrentToken());
+		throw new UnexpectedTokenException(this);
 	}
 
 	private Statement parseStatement() {
@@ -285,7 +302,7 @@ public class Parser {
 		else if (acceptPrimaryExpression()) // we could also just ignore the check
 			return parseExpressionStatement();
 
-		throw new UnexpectedTokenException(getCurrentToken());
+		throw new UnexpectedTokenException(this);
 	}
 
 	// TODO so korrekt?
@@ -337,6 +354,7 @@ public class Parser {
 		expectToken("if");
 		expectToken("(");
 		Expression e = parseExpression();
+		expectToken(")");
 		Statement s1 = parseStatement();
 		Statement s2 = null;
 		if (acceptToken("else")) {
@@ -362,7 +380,7 @@ public class Parser {
 			return new ReturnStatement(parseExpression());
 		}
 		else
-			throw new UnexpectedTokenException(getCurrentToken());
+			throw new UnexpectedTokenException(this);
 	}
 
 	public Expression parseExpression() {
@@ -404,7 +422,7 @@ public class Parser {
 		else if (acceptToken("[")) {
 			return parseArrayAccess();
 		}
-		throw new UnexpectedTokenException(getCurrentToken());
+		throw new UnexpectedTokenException(this);
 	}
 
 	private MethodInvocation parseMethodInvocation() {
@@ -473,7 +491,7 @@ public class Parser {
 			}
 		}
 
-		throw new UnexpectedTokenException(getCurrentToken());
+		throw new UnexpectedTokenException(this);
 	}
 
 	private NewArrayExpression parseNewArrayExpression() {
