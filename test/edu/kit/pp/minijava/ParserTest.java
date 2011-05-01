@@ -34,7 +34,7 @@ public class ParserTest {
 	
 	@Test
 	public void parseClassMember() throws Exception {
-		Parser p= createParserFromTokens(K("class"), I("classic"), O("{"), 
+		Parser p= createParserFromTokensWithEOF(K("class"), I("classic"), O("{"), 
 				K("public"), K("int"), I("i"), O(";"), 
 				K("public"), K("int"), O("["), O("]"), I("intArray"), O(";"),
 				O("}"));
