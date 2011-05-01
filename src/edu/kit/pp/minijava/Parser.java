@@ -183,18 +183,6 @@ public class Parser {
 		return cd;
 	}
 
-	private boolean acceptField() {
-		// type name
-		int i = 1;
-		// type dimension
-		while(acceptToken("[", i) && acceptToken("]", i + 1)) {
-			i += 2;
-		}
-		// identifier
-		i++;
-		return acceptToken(";", i);
-	}
-
 	private ClassMember parseClassMember() {
 		if (acceptToken("public")) {
 			if (acceptToken("static", 1)) {
