@@ -31,6 +31,15 @@ public class ParserTest {
 	@After
 	public void tearDown() {
 	}
+	
+	@Test
+	public void parseClassMember() throws Exception {
+		Parser p= createParserFromTokens(K("class"), I("classic"), O("{"), 
+				K("public"), K("int"), I("i"), O(";"), 
+				K("public"), K("int"), O("["), O("]"), I("intArray"), O(";"),
+				O("}"));
+		p.parseProgram();
+	}
 
 	@Test
 	public void parseAdditionExpression() throws Exception {
