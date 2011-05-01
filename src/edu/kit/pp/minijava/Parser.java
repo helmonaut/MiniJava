@@ -1,3 +1,4 @@
+// vi:ai:noet sta sw=4 ts=4 sts=0
 package edu.kit.pp.minijava;
 
 import edu.kit.pp.minijava.ast.*;
@@ -182,16 +183,25 @@ public class Parser {
 		return cd;
 	}
 
+	private boolean acceptField() {
+		// type name
+		int i = 1;
+		// type dimension
+		while(acceptToken("[", i) && acceptToken("]", i + 1)) {
+			i += 2;
+		}
+		// identifier
+		i++;
+		return acceptToken(";", i);
+	}
+
 	private ClassMember parseClassMember() {
 		if (acceptToken("public")) {
 			if (acceptToken("static", 1)) {
 				return parseMainMethod();
 			}
-			else if (acceptToken(";", 3)) { // TODO how to differ between field and method?
-				return parseField();
-			}
 			else {
-				return parseMethod();
+				return parseFieldOrMethod();
 			}
 		}
 		else {
@@ -199,12 +209,23 @@ public class Parser {
 		}
 	}
 
-	private Field parseField() throws UnexpectedTokenException {
+	private ClassMember parseFieldOrMethod() throws UnexpectedTokenException {
 		expectToken("public");
 		Type t = parseType();
 		Identifier id = expectIdentifier();
-		expectToken(";");
-		return new Field(t, id);
+		// Field
+		if(acceptToken(";")) {
+			expectToken(";");
+			return new Field(t, id);
+		}
+		// Method
+		expectToken("(");
+		Parameters p = null;
+		if (!acceptToken(")"))
+			p = parseParameters();
+		expectToken(")");
+		Block b = parseBlock();
+		return new Method(t, id, b, p);
 	}
 
 	private MainMethod parseMainMethod() {
@@ -220,19 +241,6 @@ public class Parser {
 		expectToken(")");
 		Block b = parseBlock();
 		return new MainMethod(name, variableName, b);
-	}
-
-	private Method parseMethod() {
-		expectToken("public");
-		Type type = parseType();
-		Identifier name = expectIdentifier();
-		expectToken("(");
-		Parameters p = null;
-		if (!acceptToken(")"))
-			p = parseParameters();
-		expectToken(")");
-		Block b = parseBlock();
-		return new Method(type, name, b, p);
 	}
 
 	// TODO So richtig?
