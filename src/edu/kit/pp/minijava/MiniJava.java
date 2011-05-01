@@ -73,7 +73,7 @@ public class MiniJava {
 			parser.parseProgram();
 		}
 		catch(Parser.UnexpectedTokenException e){
-			System.out.println("Unexpected Token: "+e.getToken());
+			System.out.println("Unexpected Token: " + e);
 			return;
 		}
 

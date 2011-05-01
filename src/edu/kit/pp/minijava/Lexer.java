@@ -10,18 +10,31 @@ import java.io.Reader;
 
 public class Lexer {
 	private PushbackReader _reader;
+	private int _line = 1;
+	private int _column = 1;
 
 	public Lexer(Reader reader) throws IOException {
 		_reader = new PushbackReader(new BufferedReader(reader));
+	}
+
+	public int getLine() {
+		return _line;
+	}
+
+	public int getColumn() {
+		return _column;
 	}
 
 	public Token next() throws IOException {
 		while (true) {
 			int c = read();
 			switch (c) {
-			case ' ':
 			case '\n':
+				_line++;
+				_column = 1;
+			case ' ':
 			case '\r':
+				// don't count '\r'
 			case '\t':
 				break;
 			case '/':
@@ -210,10 +223,12 @@ public class Lexer {
 	}
 
 	private int read() throws IOException {
+		_column++;
 		return (short)_reader.read();
 	}
 
 	private void unread(int c) throws IOException {
+		_column--;
 		_reader.unread(c);
 	}
 

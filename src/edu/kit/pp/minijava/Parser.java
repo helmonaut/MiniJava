@@ -9,16 +9,34 @@ import java.util.HashMap;
 // TODO alle expressions durchgehen und tokens so speziell wie möglich wählen
 
 public class Parser {
+	
+	static int _currentLookAhead = 0;
 
 	public static class UnexpectedTokenException extends RuntimeException {
 		private Token _token;
 		private int _line;
 		private int _column;
+		private String _expectedToken;
+		
+		private void init(Parser parser) {
+			_token = parser.getCurrentToken();
+			_line = parser.getLine();
+			_column = parser.getColumn();
+			_expectedToken = null;
+		}
 
 		public UnexpectedTokenException(Parser parser) {
-			_token = parser.getCurrentToken();
-			_line = parser.getCurrentLine();
-			_column = parser.getCurrentColumn();
+			init(parser);
+		}
+		
+		public UnexpectedTokenException(Parser parser, String expectedToken) {
+			init(parser);
+			_expectedToken = expectedToken;
+			
+			// _column is always one more than actually read
+			if(expectedToken.equals("EOF")) {
+				_column--;
+			}
 		}
 
 		public Token getToken() {
@@ -27,7 +45,12 @@ public class Parser {
 
 		@Override
 		public String toString() {
-			return _line + ":" + _column + " '" + _token + "'";
+			String out = _line + ":" + _column;
+			if(null != _expectedToken) {
+				out += " expected '" + _expectedToken + "' found";
+			}
+			out += " '" + _token + "'";
+			return out;
 		}
 	}
 
@@ -112,6 +135,7 @@ public class Parser {
 
 	private Token consumeToken() {
 		try {
+			_currentLookAhead = 0;
 			return _lexer.next();
 		} catch (IOException e) {
 			return null;
@@ -119,18 +143,20 @@ public class Parser {
 	}
 
 	private Token getCurrentToken() {
+		_currentLookAhead = 1;
 		return _lexer.peek(0);
 	}
 
-	private int getCurrentLine() {
-		return _lexer.getCurrentLine();
+	private int getLine() {
+		return _lexer.getLine(_currentLookAhead);
 	}
 
-	private int getCurrentColumn() {
-		return _lexer.getCurrentColumn();
+	private int getColumn() {
+		return _lexer.getColumn(_currentLookAhead);
 	}
 
 	private boolean acceptToken(String s, int pos){
+		_currentLookAhead = pos + 1;
 		return _lexer.peek(pos).getValue().equals(s);
 	}
 
@@ -154,25 +180,25 @@ public class Parser {
 
 	private Token expectToken(String s) throws UnexpectedTokenException {
 		if (!acceptToken(s))
-			throw new UnexpectedTokenException(this);
+			throw new UnexpectedTokenException(this, s);
 		return consumeToken();
 	}
 
 	private IntegerLiteral expectIntegerLiteral() throws UnexpectedTokenException {
 		if (!(getCurrentToken() instanceof IntegerLiteral))
-			throw new UnexpectedTokenException(this);
+			throw new UnexpectedTokenException(this, "INTEGER");
 		return (IntegerLiteral)consumeToken();
 	}
 
 	private Identifier expectIdentifier() throws UnexpectedTokenException {
 		if (!(getCurrentToken() instanceof Identifier))
-			throw new UnexpectedTokenException(this);
+			throw new UnexpectedTokenException(this, "IDENTIFIER");
 		return (Identifier)consumeToken();
 	}
 
 	private Token expectEOF() {
 		if (!getCurrentToken().isEof())
-			throw new UnexpectedTokenException(this);
+			throw new UnexpectedTokenException(this, "EOF");
 		return consumeToken();
 	}
 
@@ -285,7 +311,7 @@ public class Parser {
 			return new BasicType(expectToken("void"));
 		else if (acceptIdentifier())
 			return new BasicType(expectIdentifier());
-		throw new UnexpectedTokenException(this);
+		throw new UnexpectedTokenException(this, "TYPE");
 	}
 
 	private Statement parseStatement() {
