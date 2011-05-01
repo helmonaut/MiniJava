@@ -1,0 +1,8 @@
+class t1 {
+	public void foo() {
+		if(true) {
+			;
+		}
+		return ;
+	}
+}
