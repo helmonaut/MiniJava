@@ -1,0 +1,6 @@
+class T1 {
+	public void foo() {
+		T1 x;
+	}
+}
+

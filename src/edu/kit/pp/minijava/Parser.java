@@ -9,7 +9,7 @@ import java.util.HashMap;
 // TODO alle expressions durchgehen und tokens so speziell wie möglich wählen
 
 public class Parser {
-	
+
 	static int _currentLookAhead = 0;
 
 	public static class UnexpectedTokenException extends RuntimeException {
@@ -17,7 +17,7 @@ public class Parser {
 		private int _line;
 		private int _column;
 		private String _expectedToken;
-		
+
 		private void init(Parser parser) {
 			_token = parser.getCurrentToken();
 			_line = parser.getLine();
@@ -28,11 +28,11 @@ public class Parser {
 		public UnexpectedTokenException(Parser parser) {
 			init(parser);
 		}
-		
+
 		public UnexpectedTokenException(Parser parser, String expectedToken) {
 			init(parser);
 			_expectedToken = expectedToken;
-			
+
 			// _column is always one more than actually read
 			if(expectedToken.equals("EOF")) {
 				_column--;
@@ -334,16 +334,19 @@ public class Parser {
 	// TODO so korrekt?
 	private Block parseBlock() {
 		expectToken("{");
+		Block b = new Block();
 		while(!acceptToken("}")) {
-			parseBlockStatement();
+			b.add(parseBlockStatement());
 		}
 		expectToken("}");
-		return new Block();
+		return b;
 	}
 
 	private BlockStatement parseBlockStatement() {
-		if (acceptToken("{") || acceptToken(";") || acceptPrimaryExpression() ||
-				acceptToken("if") || acceptToken("while") || acceptToken("return")) {
+		if (acceptToken("{") || acceptToken(";") || acceptToken("if") || 
+				acceptToken("while") || acceptToken("return") || 
+				acceptToken("=", 2) || (acceptToken("[", 1) && !acceptToken("]", 2))) {
+				// acceptPrimaryExpression()) {
 			return parseStatement();
 		} else { // TODO meeeh
 			return parseLocalVariableDeclarationStatement();
