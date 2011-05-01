@@ -202,7 +202,7 @@ public class Parser {
 		return consumeToken();
 	}
 
-	public Node parseProgram() throws UnexpectedTokenException {
+	public Program parseProgram() throws UnexpectedTokenException {
 		Program p = new Program();
 
 		while (acceptToken("class")) {

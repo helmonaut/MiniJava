@@ -1,6 +1,7 @@
 // vi:ai:noet sta sw=4 ts=4 sts=0
 package edu.kit.pp.minijava;
 
+import edu.kit.pp.minijava.ast.Program;
 import edu.kit.pp.minijava.tokens.Token;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 public class MiniJava {
-	
+
 	private static void syntaxCheckFiles(File[] files, String fail, String success) throws IOException {
 			for(int i = 0; i < files.length; i++) {
 			Lexer lexer = new Lexer(new FileReader(files[i]));
@@ -41,9 +42,9 @@ public class MiniJava {
 
 		syntaxCheckFiles(failDir.listFiles(mjFilter), "ok", "not ok");
 		syntaxCheckFiles(successDir.listFiles(mjFilter), "not ok", "ok");
-		
+
 	}
-	
+
 	private static void runLexTest(String FileName) throws IOException {
 		runLexTest(new File(FileName));
 	}
@@ -60,7 +61,7 @@ public class MiniJava {
 		System.out.println(nextToken);
 
 	}
-	
+
 	private static void runSyntaxCheck(String FileName) throws IOException{
 		runSyntaxCheck(new File(FileName));
 	}
@@ -68,15 +69,16 @@ public class MiniJava {
 	private static void runSyntaxCheck(File file) throws IOException {
 		Lexer lexer = new Lexer(new FileReader(file));
 		Parser parser = new Parser(lexer);
-
+		Program program;
 		try{
-			parser.parseProgram();
+			program = parser.parseProgram();
 		}
 		catch(Parser.UnexpectedTokenException e){
 			System.out.println("Unexpected Token: " + e);
 			return;
 		}
-
+		System.out.println(program);
+		System.out.println("");
 		System.out.println("Correct Syntax");
 	}
 
@@ -85,10 +87,10 @@ public class MiniJava {
 		if (args.length == 0) {
 			System.out.println("Usage: MiniJava [options] <file>");
 			return;
-		}		
+		}
 
 		if (args[0].equals("--lextest")) runLexTest(args[args.length -1]);
-		else if(args[0].equals("--syntaxcheck")) runSyntaxCheck(args[args.length -1]);		    
+		else if(args[0].equals("--syntaxcheck")) runSyntaxCheck(args[args.length -1]);
 		else if(args[0].equals("--testdir")) runTestFiles(args[args.length - 1]);
-	}	
+	}
 }

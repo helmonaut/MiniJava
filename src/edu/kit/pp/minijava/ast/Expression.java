@@ -4,7 +4,7 @@ import edu.kit.pp.minijava.tokens.Token;
 
 public class Expression extends Node {
 
-	private Token _token;
+	protected Token _token;
 
 	public Expression() {
 	}
