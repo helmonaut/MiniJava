@@ -343,14 +343,11 @@ public class Parser {
 	}
 
 	private BlockStatement parseBlockStatement() {
-		if (acceptToken("{") || acceptToken(";") || acceptToken("if") || 
-				acceptToken("while") || acceptToken("return") || 
-				acceptToken("=", 2) || (acceptToken("[", 1) && !acceptToken("]", 2))) {
-				// acceptPrimaryExpression()) {
+		if (acceptToken("{") || acceptToken(";") || acceptToken("if") ||
+			acceptToken("while") || acceptToken("return") || acceptPrimaryExpression())
 			return parseStatement();
-		} else { // TODO meeeh
+		else // TODO meeeh
 			return parseLocalVariableDeclarationStatement();
-		}
 	}
 
 	private LocalVariableDeclarationStatement parseLocalVariableDeclarationStatement() {
