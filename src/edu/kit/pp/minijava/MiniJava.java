@@ -12,7 +12,7 @@ import java.io.FilenameFilter;
 public class MiniJava {
 
 	private static void syntaxCheckFiles(File[] files, String fail, String success) throws IOException {
-			for(int i = 0; i < files.length; i++) {
+		for(int i = 0; i < files.length; i++) {
 			Lexer lexer = new Lexer(new FileReader(files[i]));
 			Parser parser = new Parser(lexer);
 			try {
@@ -23,7 +23,8 @@ public class MiniJava {
 			} catch(Parser.UnexpectedTokenException e) {
 				if(null != fail) {
 					System.err.println(files[i].getCanonicalFile() + ": " + fail);
-					// System.err.println("Unexpected Token: " + e.getToken());
+					//System.err.println("Unexpected Token: " + e.getToken());
+					System.err.println(e.toString());
 				}
 			}
 		}
@@ -40,7 +41,7 @@ public class MiniJava {
 			}
 		};
 
-		syntaxCheckFiles(failDir.listFiles(mjFilter), "ok", "not ok");
+		syntaxCheckFiles(failDir.listFiles(mjFilter), "ok, expected to fail", "not ok");
 		syntaxCheckFiles(successDir.listFiles(mjFilter), "not ok", "ok");
 
 	}

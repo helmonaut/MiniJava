@@ -12,6 +12,7 @@ public class Lexer {
 	private PushbackReader _reader;
 	private int _line = 1;
 	private int _column = 1;
+	private final int TABSIZE= 4;
 
 	public Lexer(Reader reader) throws IOException {
 		_reader = new PushbackReader(new BufferedReader(reader));
@@ -36,6 +37,7 @@ public class Lexer {
 			case '\r':
 				// don't count '\r'
 			case '\t':
+				_column += TABSIZE - 1;
 				break;
 			case '/':
 				c = read();
@@ -231,7 +233,10 @@ public class Lexer {
 	}
 
 	private void unread(int c) throws IOException {
-		_column--;
+		if (c == '\t') 
+			_column -= TABSIZE;
+		else 
+			_column--;
 		_reader.unread(c);
 	}
 
