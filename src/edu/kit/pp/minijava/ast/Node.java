@@ -41,8 +41,10 @@ public class Node {
 					if (o != null) {
 						if (o instanceof Node)
 							result += ((Node) o).toString(deep + 1);
-						else
-							result += indention + "-" +  o.toString() + "\n";
+						else {
+							String name = field.getName().substring(1);
+							result += indention + "-" + name + ": " + o.toString() + "\n";
+						}
 					}
 				} catch (IllegalAccessException ex) {
 					System.out.println(ex.getLocalizedMessage());
