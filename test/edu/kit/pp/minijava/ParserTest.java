@@ -65,13 +65,14 @@ public class ParserTest {
 	
 	@Test
 	public void parseSimpleAdditionAndMultiplicationExpressionWithUnaryOperators() throws Exception {
-		Parser p = createParserFromTokens(O("-"), I("a"), O("+"), I("b"), O("*"), O("-"), I("c"));
+		Parser p = createParserFromTokens(O("-"), I("a"), O("+"), O("-"), I("b"), O("*"), O("-"), I("c"));
 		BinaryExpression e = (BinaryExpression) p.parseExpression();
 		assertEquals("+", e.getToken().getValue());
 		assertEquals("-", e.getLeft().getToken().getValue());
 		assertEquals("a", ((UnaryExpression) e.getLeft()).getOperand().getToken().getValue());
 		assertEquals("*", e.getRight().getToken().getValue());
-		assertEquals("b", ((BinaryExpression) e.getRight()).getLeft().getToken().getValue());
+		assertEquals("-", ((BinaryExpression) e.getRight()).getLeft().getToken().getValue());
+		assertEquals("b", ((UnaryExpression) ((BinaryExpression) e.getRight()).getLeft()).getOperand().getToken().getValue());
 		assertEquals("-", ((BinaryExpression) e.getRight()).getRight().getToken().getValue());
 		assertEquals("c", ((UnaryExpression) ((BinaryExpression) e.getRight()).getRight()).getOperand().getToken().getValue());
 	}
