@@ -127,7 +127,7 @@ public class Parser {
 
 	private void initalizeExpressionParserMap(){
 		_expressionParsers=new HashMap<String, ParserFunction>();
-		_expressionParsers.put("=", new ParserFunction(1, null, new ParserFunction.ParseBinaryExpressionInfixFunction(this, new String[] {"="}, 1)));
+		_expressionParsers.put("=", new ParserFunction(1, null, new ParserFunction.ParseBinaryExpressionInfixFunction(this, new String[] {"="}, 1 - 1)));
 		_expressionParsers.put("||", new ParserFunction(2, null, new ParserFunction.ParseBinaryExpressionInfixFunction(this, new String[] {"||"}, 2)));
 		_expressionParsers.put("&&", new ParserFunction(3, null, new ParserFunction.ParseBinaryExpressionInfixFunction(this, new String[] {"&&"}, 3)));
 		ParserFunction ef = new ParserFunction(4, null, new ParserFunction.ParseBinaryExpressionInfixFunction(this, new String[] {"==", "!="}, 4));
