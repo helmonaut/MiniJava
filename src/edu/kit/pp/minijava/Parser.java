@@ -56,15 +56,20 @@ public class Parser {
 		public static interface ParseExpressionInfixFunction {
 			Expression parse(Expression left);
 		}
-		public static class ParseBinaryExpressionInfixFunction implements ParseExpressionInfixFunction {
-			private Parser _parser;
-			private String[] _operators;
-			private int _precedence;
-
-			public ParseBinaryExpressionInfixFunction(Parser parser, String[] operators, int precedence) {
+		private static abstract class ParseExpressionFunction {
+			protected Parser _parser;
+			protected String[] _operators;
+			protected int _precedence;
+			
+			public ParseExpressionFunction(Parser parser, String[] operators, int precedence) {
 				_parser = parser;
 				_operators = operators;
 				_precedence = precedence;
+			}
+		}
+		public static class ParseBinaryExpressionInfixFunction extends ParseExpressionFunction implements ParseExpressionInfixFunction {
+			public ParseBinaryExpressionInfixFunction(Parser parser, String[] operators, int precedence) {
+				super(parser, operators, precedence);
 			}
 
 			@Override
@@ -81,6 +86,27 @@ public class Parser {
 				Token t = _parser.expectToken(o);
 				Expression right = _parser.parseExpression(_precedence + 1);
 				return new BinaryExpression(t, left, right);
+			}
+		}
+		public static class ParseUnaryExpressionPrefixFunction extends ParseExpressionFunction implements ParseExpressionPrefixFunction {
+			public ParseUnaryExpressionPrefixFunction(Parser parser, String[] operators, int precedence) {
+				super(parser, operators, precedence);
+			}
+			
+			@Override
+			public Expression parse() {
+				String o = null;
+				for (String operator : _operators) {
+					if (_parser.acceptToken(operator)) {
+						o = operator;
+						break;
+					}
+				}
+				if (o == null)
+					throw _parser.error();
+				Token t = _parser.expectToken(o);
+				Expression right = _parser.parseExpression(_precedence);
+				return new UnaryExpression(t, right);
 			}
 		}
 
@@ -101,7 +127,6 @@ public class Parser {
 
 	private void initalizeExpressionParserMap(){
 		_expressionParsers=new HashMap<String, ParserFunction>();
-
 		_expressionParsers.put("=", new ParserFunction(1, null, new ParserFunction.ParseBinaryExpressionInfixFunction(this, new String[] {"="}, 1)));
 		_expressionParsers.put("||", new ParserFunction(2, null, new ParserFunction.ParseBinaryExpressionInfixFunction(this, new String[] {"||"}, 2)));
 		_expressionParsers.put("&&", new ParserFunction(3, null, new ParserFunction.ParseBinaryExpressionInfixFunction(this, new String[] {"&&"}, 3)));
@@ -113,7 +138,10 @@ public class Parser {
 		_expressionParsers.put("<=", cf);
 		_expressionParsers.put(">", cf);
 		_expressionParsers.put(">=", cf);
-		ParserFunction af = new ParserFunction(6, null, new ParserFunction.ParseBinaryExpressionInfixFunction(this, new String[] {"+", "-"}, 6));
+		ParserFunction af = new ParserFunction(
+				6,
+				new ParserFunction.ParseUnaryExpressionPrefixFunction(this, new String[] {"+", "-"}, 8),
+				new ParserFunction.ParseBinaryExpressionInfixFunction(this, new String[] {"+", "-"}, 6));
 		_expressionParsers.put("+", af);
 		_expressionParsers.put("-", af);
 		ParserFunction mf = new ParserFunction(7, null, new ParserFunction.ParseBinaryExpressionInfixFunction(this, new String[] {"*", "/", "%"}, 7));

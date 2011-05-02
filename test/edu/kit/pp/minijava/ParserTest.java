@@ -42,7 +42,7 @@ public class ParserTest {
 	}
 
 	@Test
-	public void parseAdditionExpression() throws Exception {
+	public void parseSimpleAdditionExpression() throws Exception {
 		Parser p = createParserFromTokens(I("a"), O("+"), I("b"), O("+"), I("c"));
 		BinaryExpression e = (BinaryExpression) p.parseExpression();
 		assertEquals("+", e.getToken().getValue());
@@ -53,7 +53,7 @@ public class ParserTest {
 	}
 
 	@Test
-	public void parseAdditionAndMultiplicationExpression() throws Exception {
+	public void parseSimpleAdditionAndMultiplicationExpression() throws Exception {
 		Parser p = createParserFromTokens(I("a"), O("+"), I("b"), O("*"), I("c"));
 		BinaryExpression e = (BinaryExpression) p.parseExpression();
 		assertEquals("+", e.getToken().getValue());
@@ -61,6 +61,19 @@ public class ParserTest {
 		assertEquals("*", e.getRight().getToken().getValue());
 		assertEquals("b", ((BinaryExpression) e.getRight()).getLeft().getToken().getValue());
 		assertEquals("c", ((BinaryExpression) e.getRight()).getRight().getToken().getValue());
+	}
+	
+	@Test
+	public void parseSimpleAdditionAndMultiplicationExpressionWithUnaryOperators() throws Exception {
+		Parser p = createParserFromTokens(O("-"), I("a"), O("+"), I("b"), O("*"), O("-"), I("c"));
+		BinaryExpression e = (BinaryExpression) p.parseExpression();
+		assertEquals("+", e.getToken().getValue());
+		assertEquals("-", e.getLeft().getToken().getValue());
+		assertEquals("a", ((UnaryExpression) e.getLeft()).getOperand().getToken().getValue());
+		assertEquals("*", e.getRight().getToken().getValue());
+		assertEquals("b", ((BinaryExpression) e.getRight()).getLeft().getToken().getValue());
+		assertEquals("-", ((BinaryExpression) e.getRight()).getRight().getToken().getValue());
+		assertEquals("c", ((UnaryExpression) ((BinaryExpression) e.getRight()).getRight()).getOperand().getToken().getValue());
 	}
 
 	@Test
