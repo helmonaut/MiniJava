@@ -18,23 +18,16 @@ public class Parser {
 		private int _column;
 		private String _expectedToken;
 
-		private void init(Parser parser) {
-			_token = parser.getCurrentToken();
-			_line = parser.getLine();
-			_column = parser.getColumn();
-			_expectedToken = null;
+		public UnexpectedTokenException(Token token, int line, int column) {
+			this(token, line, column, null);
 		}
 
-		public UnexpectedTokenException(Parser parser) {
-			init(parser);
-		}
-
-		public UnexpectedTokenException(Parser parser, String expectedToken) {
-			init(parser);
+		public UnexpectedTokenException(Token token, int line, int column, String expectedToken) {
+			_token = token;
+			_line = line;
+			_column = column;
 			_expectedToken = expectedToken;
-
-			// _column is always one more than actually read
-			if(expectedToken.equals("EOF")) {
+			if (expectedToken != null && expectedToken.equals("EOF")) {
 				_column--;
 			}
 		}
@@ -45,12 +38,14 @@ public class Parser {
 
 		@Override
 		public String toString() {
-			String out = _line + ":" + _column;
-			if(null != _expectedToken) {
-				out += " expected '" + _expectedToken + "' found";
-			}
-			out += " '" + _token + "'";
-			return out;
+			String result = "Unexpected token at line " + _line + ", column " + _column + ":";
+			if (null != _expectedToken)
+				result += " Expected '" + _expectedToken + "', found '" + _token + "'.";
+			else
+				result += " Found '" + _token + "'.";
+
+
+			return result;
 		}
 	}
 
@@ -82,7 +77,7 @@ public class Parser {
 					}
 				}
 				if (o == null)
-					throw new UnexpectedTokenException(_parser);
+					throw _parser.error();
 				Token t = _parser.expectToken(o);
 				Expression right = _parser.parseExpression(_precedence + 1);
 				return new BinaryExpression(t, left, right);
@@ -142,6 +137,14 @@ public class Parser {
 		}
 	}
 
+	private UnexpectedTokenException error() {
+		return new UnexpectedTokenException(getCurrentToken(), getLine(), getColumn());
+	}
+
+	private UnexpectedTokenException error(String expectedToken) {
+		return new UnexpectedTokenException(getCurrentToken(), getLine(), getColumn(), expectedToken);
+	}
+
 	private Token getCurrentToken() {
 		_currentLookAhead = 1;
 		return _lexer.peek(0);
@@ -180,25 +183,25 @@ public class Parser {
 
 	private Token expectToken(String s) throws UnexpectedTokenException {
 		if (!acceptToken(s))
-			throw new UnexpectedTokenException(this, s);
+			throw error(s);
 		return consumeToken();
 	}
 
 	private IntegerLiteral expectIntegerLiteral() throws UnexpectedTokenException {
 		if (!(getCurrentToken() instanceof IntegerLiteral))
-			throw new UnexpectedTokenException(this, "INTEGER");
+			throw error("INTEGER");
 		return (IntegerLiteral)consumeToken();
 	}
 
 	private Identifier expectIdentifier() throws UnexpectedTokenException {
 		if (!(getCurrentToken() instanceof Identifier))
-			throw new UnexpectedTokenException(this, "IDENTIFIER");
+			throw error("IDENTIFIER");
 		return (Identifier)consumeToken();
 	}
 
 	private Token expectEOF() {
 		if (!getCurrentToken().isEof())
-			throw new UnexpectedTokenException(this, "EOF");
+			throw error("EOF");
 		return consumeToken();
 	}
 
@@ -236,7 +239,7 @@ public class Parser {
 			}
 		}
 		else {
-			throw new UnexpectedTokenException(this);
+			throw error();
 		}
 	}
 
@@ -311,7 +314,7 @@ public class Parser {
 			return new BasicType(expectToken("void"));
 		else if (acceptIdentifier())
 			return new BasicType(expectIdentifier());
-		throw new UnexpectedTokenException(this, "TYPE");
+		throw error("TYPE");
 	}
 
 	private Statement parseStatement() {
@@ -328,7 +331,7 @@ public class Parser {
 		else if (acceptPrimaryExpression()) // we could also just ignore the check
 			return parseExpressionStatement();
 
-		throw new UnexpectedTokenException(this);
+		throw error();
 	}
 
 	// TODO so korrekt?
@@ -406,7 +409,7 @@ public class Parser {
 			return new ReturnStatement(parseExpression());
 		}
 		else
-			throw new UnexpectedTokenException(this);
+			throw error();
 	}
 
 	public Expression parseExpression() {
@@ -448,7 +451,7 @@ public class Parser {
 		else if (acceptToken("[")) {
 			return parseArrayAccess();
 		}
-		throw new UnexpectedTokenException(this);
+		throw error();
 	}
 
 	private MethodInvocation parseMethodInvocation() {
@@ -517,7 +520,7 @@ public class Parser {
 			}
 		}
 
-		throw new UnexpectedTokenException(this);
+		throw error();
 	}
 
 	private NewArrayExpression parseNewArrayExpression() {
