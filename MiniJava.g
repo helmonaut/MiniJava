@@ -20,22 +20,22 @@ Type: BasicType ('[' ']')* ;
 
 BasicType: 'int' | 'boolean' | 'void' | IDENT;
 
-//rule Statement has non-LL(*) decision due to recursive rule invocations reachable from alts 3,4.  
+//rule Statement has non-LL(*) decision due to recursive rule invocations reachable from alts 3,4.
 //Resolve by left-factoring or using syntactic predicates or using backtrack=true option.
-Statement: 	  Block
-	| EmptyStatement
-	| IfStatement
-	| ExpressionStatement
-	| WhileStatement
-	| ReturnStatement
-	;
+Statement:    Block
+  | EmptyStatement
+  | IfStatement
+  | ExpressionStatement
+  | WhileStatement
+  | ReturnStatement
+  ;
 
 Block: '{' BlockStatement* '}';
 
-//rule BlockStatement has non-LL(*) decision due to recursive rule invocations reachable from alts 1,2.  
+//rule BlockStatement has non-LL(*) decision due to recursive rule invocations reachable from alts 1,2.
 //Resolve by left-factoring or using syntactic predicates or using backtrack=true option.
-BlockStatement: Statement 
-	| LocalVariableDeclarationStatement;
+BlockStatement: Statement
+  | LocalVariableDeclarationStatement;
 
 LocalVariableDeclarationStatement: Type IDENT ('=' AssignmentExpression)? ';';
 
@@ -51,28 +51,28 @@ ReturnStatement: 'return' AssignmentExpression? ';' ;
 
 //Expression: AssignmentExpression ;
 
-AssignmentExpression: 	LogicalOrExpression ('=' AssignmentExpression)? 	;
+AssignmentExpression:   LogicalOrExpression ('=' AssignmentExpression)*   ;
 
-LogicalOrExpression: LogicalAndExpression ('||' LogicalOrExpression)? ;
+LogicalOrExpression: LogicalAndExpression ('||' LogicalOrExpression)* ;
 
-LogicalAndExpression: EqualityExpression ('&&' LogicalAndExpression )? ;
+LogicalAndExpression: EqualityExpression ('&&' LogicalAndExpression )* ;
 
-EqualityExpression: RelationalExpression (( '==' | '!=' ) EqualityExpression )? ;
+EqualityExpression: RelationalExpression (( '==' | '!=' ) EqualityExpression )* ;
 
-RelationalExpression: AdditiveExpression (('<' | '<=' | '>' | '>=') RelationalExpression )? ;
+RelationalExpression: AdditiveExpression (('<' | '<=' | '>' | '>=') RelationalExpression )* ;
 
-AdditiveExpression: MultiplicativeExpression (('+'|'-') AdditiveExpression)? ;
+AdditiveExpression: MultiplicativeExpression (('+'|'-') AdditiveExpression)* ;
 
-MultiplicativeExpression: UnaryExpression (('*' |  '/' | '%') MultiplicativeExpression)? ;
+MultiplicativeExpression: UnaryExpression (('*' |  '/' | '%') MultiplicativeExpression)* ;
 
 UnaryExpression: PostfixExpression | ('!'|'-') UnaryExpression ;
 
 PostfixExpression: PrimaryExpression (PostfixOp)* ;
 
 PostfixOp: MethodInvocation
-	| FieldAccess
-	| ArrayAccess
-	;
+  | FieldAccess
+  | ArrayAccess
+  ;
 
 MethodInvocation: '.' IDENT '(' Arguments ')';
 
@@ -82,16 +82,16 @@ ArrayAccess: '[' AssignmentExpression ']' ;
 Arguments: (AssignmentExpression (',' AssignmentExpression)*)? ;
 
 PrimaryExpression: 'null'
-	| 'false'
-	| 'true'
-	| INTEGER_LITERAL
-	| IDENT
-	| IDENT '(' Arguments ')'
-	| 'this'
-	| '(' AssignmentExpression ')'
-	| NewObjectExpression
-	| NewArrayExpression
-	;
+  | 'false'
+  | 'true'
+  | INTEGER_LITERAL
+  | IDENT
+  | IDENT '(' Arguments ')'
+  | 'this'
+  | '(' AssignmentExpression ')'
+  | NewObjectExpression
+  | NewArrayExpression
+  ;
 
 NewObjectExpression: 'new' IDENT '(' ')' ;
 
