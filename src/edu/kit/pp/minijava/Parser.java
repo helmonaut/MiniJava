@@ -148,6 +148,10 @@ public class Parser {
 		_expressionParsers.put("*", mf);
 		_expressionParsers.put("/", mf);
 		_expressionParsers.put("%", mf);
+		_expressionParsers.put("!", new ParserFunction(
+				8,
+				new ParserFunction.ParseUnaryExpressionPrefixFunction(this, new String[] {"!"}, 8),
+				null));
 	}
 
 	public Parser(Lexer lexer) throws IOException {
@@ -200,7 +204,11 @@ public class Parser {
 	}
 
 	private boolean acceptIdentifier() {
-		return getCurrentToken() instanceof Identifier;
+		return acceptIdentifier(0);
+	}
+	
+	private boolean acceptIdentifier(int pos) {
+		return _lexer.peek(pos) instanceof Identifier;
 	}
 
 	private boolean acceptPrimaryExpression() {
@@ -374,11 +382,14 @@ public class Parser {
 	}
 
 	private BlockStatement parseBlockStatement() {
-		if (acceptToken("{") || acceptToken(";") || acceptToken("if") ||
-			acceptToken("while") || acceptToken("return") || acceptPrimaryExpression())
-			return parseStatement();
-		else // TODO meeeh
+		if (acceptToken("int") || acceptToken("boolean") || acceptToken("void") ||
+				acceptIdentifier() && (acceptIdentifier(1) || (acceptToken("[", 1) && acceptToken("]", 2)))) {
 			return parseLocalVariableDeclarationStatement();
+		}
+		/*if (acceptToken("{") || acceptToken(";") || acceptToken("if") || acceptToken("while") || acceptToken("return")) {
+			return parseStatement();
+		}*/
+		return parseStatement();
 	}
 
 	private LocalVariableDeclarationStatement parseLocalVariableDeclarationStatement() {
@@ -451,7 +462,7 @@ public class Parser {
 		if (pf != null && pf._parseExpressionPrefixFunction != null)
 			left = pf._parseExpressionPrefixFunction.parse();
 		else
-			left = parsePrimaryExpression();
+			left = parsePostfixExpression();
 
 		while (true) {
 			pf = _expressionParsers.get(getCurrentToken().toString());
@@ -468,6 +479,14 @@ public class Parser {
 		return left;
 	}
 
+	private PostfixExpression parsePostfixExpression() {
+		PostfixExpression e = new PostfixExpression(parsePrimaryExpression());
+		while (acceptToken(".") || acceptToken("[")) {
+			e.add(parsePostfixOp());
+		}
+		return e;
+	}
+	
 	private PostfixOp parsePostfixOp() {
 		if (acceptToken(".")) {
 			if (acceptToken("(", 2)) {

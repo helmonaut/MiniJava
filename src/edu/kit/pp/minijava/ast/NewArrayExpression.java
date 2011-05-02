@@ -1,6 +1,6 @@
 package edu.kit.pp.minijava.ast;
 
-public class NewArrayExpression extends Expression {
+public class NewArrayExpression extends PrimaryExpression {
 
 	private BasicType _basicType;
 	private Expression _expression;
