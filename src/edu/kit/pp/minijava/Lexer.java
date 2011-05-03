@@ -33,11 +33,14 @@ public class Lexer {
 			case '\n':
 				_line++;
 				_column = 1;
+				break;
 			case ' ':
 			case '\r':
+				_column += 1;
+				break;
 				// don't count '\r'
 			case '\t':
-				_column += TABSIZE - 1;
+				_column += 4-(_column%TABSIZE);
 				break;
 			case '/':
 				c = read();
