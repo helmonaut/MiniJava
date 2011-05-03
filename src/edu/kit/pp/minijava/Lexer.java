@@ -39,7 +39,7 @@ public class Lexer {
 			case '\r':
 				break;
 			case '\t':
-				_column += 4-(_column%TABSIZE)-1;
+				_column += 4-((_column-1)%TABSIZE);
 				break;
 			case '/':
 				c = read();
