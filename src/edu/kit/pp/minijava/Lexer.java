@@ -226,6 +226,7 @@ public class Lexer {
 		}
 	}
 
+	private int _lastTab = 0;
 	private int read() throws IOException {
 		int c= (short)_reader.read();
 		if (c == '\n') {
@@ -233,7 +234,8 @@ public class Lexer {
 			_column = 1;			
 		}
 		else if ( c== '\t') {
-			_column += 4-((_column-1)%TABSIZE);
+			_lastTab = 4 - ((_column - 1) % TABSIZE);
+			_column += _lastTab;
 		}
 		else {
 			_column++;
@@ -245,7 +247,7 @@ public class Lexer {
 		if (c == '\t') {
 			//nothing else to do, columns are aligned to
 			//tab sizes
-			_column -= TABSIZE;
+			_column -= _lastTab;
 		}
 		else if (c == '\n') {
 			//this is not supported, line lengths are not
