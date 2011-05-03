@@ -26,12 +26,9 @@ public class Lexer {
 		return _column;
 	}
 
-	int x = 0;
 	public Token next() throws IOException {
 		while (true) {
 			int c = read();
-			if('w' == c || 1 == x)
-				x = 1;
 			switch (c) {
 			case '\n':
 				_line++;
