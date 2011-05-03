@@ -444,7 +444,11 @@ public class Parser {
 			expectToken(";");
 			return new ReturnStatement(null);
 		}
-		else return new ReturnStatement(parseExpression());
+		else {
+			ReturnStatement r= new ReturnStatement(parseExpression());
+			expectToken(";");
+			return r;
+		}
 	}
 
 	public Expression parseExpression() {
