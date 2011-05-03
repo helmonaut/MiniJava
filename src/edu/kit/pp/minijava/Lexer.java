@@ -31,15 +31,12 @@ public class Lexer {
 			int c = read();
 			switch (c) {
 			case '\n':
-				_line++;
-				_column = 1;			
 				break;
 			case ' ':
 				break;
 			case '\r':
 				break;
 			case '\t':
-				_column += 4-((_column-1)%TABSIZE);
 				break;
 			case '/':
 				c = read();
@@ -230,15 +227,34 @@ public class Lexer {
 	}
 
 	private int read() throws IOException {
-		_column++;
-		return (short)_reader.read();
+		int c= (short)_reader.read();
+		if (c == '\n') {
+			_line++;
+			_column = 1;			
+		}
+		else if ( c== '\t') {
+			_column += 4-((_column-1)%TABSIZE);
+		}
+		else {
+			_column++;
+		}
+		return c;
 	}
 
 	private void unread(int c) throws IOException {
-		if (c == '\t') 
+		if (c == '\t') {
+			//nothing else to do, columns are aligned to
+			//tab sizes
 			_column -= TABSIZE;
+		}
+		else if (c == '\n') {
+			//this is not supported, line lengths are not
+			//stored - see comment handling with comments
+			//over multiple lines
+		}
 		else 
 			_column--;
+		
 		_reader.unread(c);
 	}
 
