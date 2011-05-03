@@ -14,10 +14,14 @@ public class Lexer {
 	private int _line = 1;
 	private int _column = 1;
 	private final int TABSIZE= 4;
+
+	private boolean _lastCharIsCRLF= false;
+
 	private ArrayList<Integer> _lineLengths= new ArrayList<Integer>();
 
 	public Lexer(Reader reader) throws IOException {
-		_reader = new PushbackReader(new BufferedReader(reader));
+		final int UNDOBUFFERSIZE= 2;
+		_reader = new PushbackReader(new BufferedReader(reader), UNDOBUFFERSIZE);
 	}
 
 	public int getLine() {
@@ -229,10 +233,28 @@ public class Lexer {
 	private int _lastTab = 0;
 	private int read() throws IOException {
 		int c= (short)_reader.read();
-		if (c == '\n') {
+		if (c == '\r') {
+			_lastCharIsCRLF= false;
+
+			int nextchar= (short)_reader.read();
+			if (nextchar == '\n') {
+				_lastCharIsCRLF= true;
+				c= nextchar;
+			}			
+			else {
+				_reader.unread(nextchar);
+			}
+
 			_lineLengths.add(new Integer(_column));
 			_line++;
 			_column = 1;
+			return c;
+		}
+		else if (c == '\n') {
+			_lineLengths.add(new Integer(_column));
+			_line++;
+			_column = 1;
+			return c;
 		}
 		else if ( c== '\t') {
 			_lastTab = 4 - ((_column - 1) % TABSIZE);
@@ -245,14 +267,32 @@ public class Lexer {
 	}
 
 	private void unread(int c) throws IOException {
-		if (c == '\t') {
+		if (c == '\n') {
+			if (_lastCharIsCRLF == true) {
+				_lastCharIsCRLF= false;
+				_reader.unread('\n');
+				_reader.unread('\r');
+				_column= _lineLengths.remove(_lineLengths.size()-1).intValue();
+				_line--;
+				return;
+			}
+			else {
+				_reader.unread(c);
+				_column= _lineLengths.remove(_lineLengths.size()-1).intValue();
+				_line--;
+				return;
+			}
+		}
+		else if (c == '\r') {
+			_reader.unread(c);
+			_column= _lineLengths.remove(_lineLengths.size()-1).intValue();
+			_line--;
+			return;
+		}
+		else if (c == '\t') {
 			//nothing else to do, columns are aligned to
 			//tab sizes
 			_column -= _lastTab;
-		}
-		else if (c == '\n') {
-			_column= _lineLengths.remove(_lineLengths.size()-1).intValue();
-			_line--;
 		}
 		else 
 			_column--;
