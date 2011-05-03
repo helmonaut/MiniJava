@@ -7,7 +7,7 @@
 const int ExpressionSkipProbability=10;
 const int ExpressionRecursionSoftLimit=10;
 const int StatementRecursionSoftLimit=25;
-const bool SanerWhitespaces=false;
+const bool SanerWhitespaces=true;
 
 
 const int KeywordCount = 53;
@@ -582,6 +582,7 @@ void genMainMethod(){
 void genMethod(){
   emit("public");
   genType();
+  genIdent();
   emit("(");
   if((rand()%4)!=0) genParameters();
   emit(")");
