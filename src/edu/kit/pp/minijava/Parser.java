@@ -364,10 +364,10 @@ public class Parser {
 			return parseWhileStatement();
 		else if (acceptToken("return"))
 			return parseReturnStatement();
-		else if (acceptPrimaryExpression()) // we could also just ignore the check
+		else //if (acceptPrimaryExpression()) // we could also just ignore the check, no we should expressions can start with unary operators!
 			return parseExpressionStatement();
 
-		throw error();
+		//		throw error();
 	}
 
 	// TODO so korrekt?
@@ -444,11 +444,7 @@ public class Parser {
 			expectToken(";");
 			return new ReturnStatement(null);
 		}
-		else if (acceptPrimaryExpression()) {
-			return new ReturnStatement(parseExpression());
-		}
-		else
-			throw error();
+		else return new ReturnStatement(parseExpression());
 	}
 
 	public Expression parseExpression() {
