@@ -36,17 +36,17 @@ public class LexerTest {
 	public void testGetTextPosition3Lines() throws Exception {
 		Lexer lex= createLexer("ab\ncde\nfgh");
 		lex.next();
-		int col= lex.getColumn();
-		int line= lex.getLine();
-		assertTrue(col == 3 && line == 1);
+		int col1= lex.getColumn();
+		int line1= lex.getLine();
 		lex.next();
-		col= lex.getColumn();
-		line= lex.getLine();
-		assertTrue(col == 4 && line == 2);
+		int col2= lex.getColumn();
+		int line2= lex.getLine();
 		lex.next();
-		col= lex.getColumn();
-		line= lex.getLine();
-		assertTrue(col == 4 && line == 3);
+		int col3= lex.getColumn();
+		int line3= lex.getLine();
+		assertTrue(col1 == 3 && line1 == 1);
+		assertTrue(col2 == 4 && line2 == 2);
+		assertTrue(col3 == 4 && line3 == 3);
 	}
 	
 

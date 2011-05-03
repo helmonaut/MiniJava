@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
+import java.util.ArrayList;
 
 
 public class Lexer {
@@ -13,6 +14,7 @@ public class Lexer {
 	private int _line = 1;
 	private int _column = 1;
 	private final int TABSIZE= 4;
+	private ArrayList<Integer> _lineLengths= new ArrayList<Integer>();
 
 	public Lexer(Reader reader) throws IOException {
 		_reader = new PushbackReader(new BufferedReader(reader));
@@ -230,8 +232,9 @@ public class Lexer {
 	private int read() throws IOException {
 		int c= (short)_reader.read();
 		if (c == '\n') {
+			_lineLengths.add(new Integer(_column));
 			_line++;
-			_column = 1;			
+			_column = 1;
 		}
 		else if ( c== '\t') {
 			_lastTab = 4 - ((_column - 1) % TABSIZE);
@@ -253,6 +256,8 @@ public class Lexer {
 			//this is not supported, line lengths are not
 			//stored - see comment handling with comments
 			//over multiple lines
+			_column= _lineLengths.remove(_lineLengths.size()-1).intValue();
+			_line--;
 		}
 		else 
 			_column--;
