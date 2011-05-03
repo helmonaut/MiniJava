@@ -184,8 +184,6 @@ public class Lexer {
 				break;
 			case -1: return;
 			case '\n':
-				_line++;
-				_column = 1;
 			default: ;
 			}
 		}
@@ -253,9 +251,6 @@ public class Lexer {
 			_column -= _lastTab;
 		}
 		else if (c == '\n') {
-			//this is not supported, line lengths are not
-			//stored - see comment handling with comments
-			//over multiple lines
 			_column= _lineLengths.remove(_lineLengths.size()-1).intValue();
 			_line--;
 		}
