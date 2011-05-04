@@ -1,16 +1,13 @@
-// vi:ai:noet sta sw=4 ts=4 sts=0
 package edu.kit.pp.minijava;
 
 import edu.kit.pp.minijava.ast.*;
 import edu.kit.pp.minijava.tokens.*;
 import java.io.IOException;
 import java.util.HashMap;
-// TODO error() method for throwing Exception
-// TODO alle expressions durchgehen und tokens so speziell wie möglich wählen
 
 public class Parser {
 
-	static int _currentLookAhead = 0;
+	private int _currentLookAhead = 0;
 
 	public static class UnexpectedTokenException extends RuntimeException {
 		private Token _token;
@@ -43,8 +40,6 @@ public class Parser {
 				result += " Expected '" + _expectedToken + "', found '" + _token + "'.";
 			else
 				result += " Found '" + _token + "'.";
-
-
 			return result;
 		}
 	}
@@ -53,20 +48,23 @@ public class Parser {
 		public static interface ParseExpressionPrefixFunction {
 			Expression parse();
 		}
+
 		public static interface ParseExpressionInfixFunction {
 			Expression parse(Expression left);
 		}
+
 		private static abstract class ParseExpressionFunction {
 			protected Parser _parser;
 			protected String[] _operators;
 			protected int _precedence;
-			
+
 			public ParseExpressionFunction(Parser parser, String[] operators, int precedence) {
 				_parser = parser;
 				_operators = operators;
 				_precedence = precedence;
 			}
 		}
+
 		public static class ParseBinaryExpressionInfixFunction extends ParseExpressionFunction implements ParseExpressionInfixFunction {
 			public ParseBinaryExpressionInfixFunction(Parser parser, String[] operators, int precedence) {
 				super(parser, operators, precedence);
@@ -88,11 +86,12 @@ public class Parser {
 				return new BinaryExpression(t, left, right);
 			}
 		}
+
 		public static class ParseUnaryExpressionPrefixFunction extends ParseExpressionFunction implements ParseExpressionPrefixFunction {
 			public ParseUnaryExpressionPrefixFunction(Parser parser, String[] operators, int precedence) {
 				super(parser, operators, precedence);
 			}
-			
+
 			@Override
 			public Expression parse() {
 				String o = null;
@@ -206,7 +205,7 @@ public class Parser {
 	private boolean acceptIdentifier() {
 		return acceptIdentifier(0);
 	}
-	
+
 	private boolean acceptIdentifier(int pos) {
 		return _lexer.peek(pos) instanceof Identifier;
 	}
@@ -364,13 +363,10 @@ public class Parser {
 			return parseWhileStatement();
 		else if (acceptToken("return"))
 			return parseReturnStatement();
-		else //if (acceptPrimaryExpression()) // we could also just ignore the check, no we should expressions can start with unary operators!
+		else
 			return parseExpressionStatement();
-
-		//		throw error();
 	}
 
-	// TODO so korrekt?
 	private Block parseBlock() {
 		expectToken("{");
 		Block b = new Block();
@@ -386,9 +382,6 @@ public class Parser {
 				acceptIdentifier() && (acceptIdentifier(1) || (acceptToken("[", 1) && acceptToken("]", 2)))) {
 			return parseLocalVariableDeclarationStatement();
 		}
-		/*if (acceptToken("{") || acceptToken(";") || acceptToken("if") || acceptToken("while") || acceptToken("return")) {
-			return parseStatement();
-		}*/
 		return parseStatement();
 	}
 
@@ -468,7 +461,7 @@ public class Parser {
 			pf = _expressionParsers.get(getCurrentToken().toString());
 
 			if (pf == null)
-				break;// throw new UnexpectedTokenException(getCurrentToken());
+				break;
 
 			if (pf._parseExpressionInfixFunction == null || pf._precedence < precedence)
 				break;
@@ -486,7 +479,7 @@ public class Parser {
 		}
 		return e;
 	}
-	
+
 	private PostfixOp parsePostfixOp() {
 		if (acceptToken(".")) {
 			if (acceptToken("(", 2)) {

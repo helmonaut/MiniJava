@@ -30,9 +30,9 @@ public class MiniJava {
 		}
 	}
 
-	private static void runTestFiles(String DirName) throws IOException {
-		File failDir = new File(DirName, "fail");
-		File successDir = new File(DirName, "success");
+	private static void runTestFiles(String dirName) throws IOException {
+		File failDir = new File(dirName, "fail");
+		File successDir = new File(dirName, "success");
 
 		FilenameFilter mjFilter = new FilenameFilter() {
 			@Override
@@ -46,8 +46,8 @@ public class MiniJava {
 
 	}
 
-	private static void runLexTest(String FileName) throws IOException {
-		runLexTest(new File(FileName));
+	private static void runLexTest(String fileName) throws IOException {
+		runLexTest(new File(fileName));
 	}
 
 	private static void runLexTest(File file) throws IOException {
@@ -63,8 +63,8 @@ public class MiniJava {
 
 	}
 
-	private static void runSyntaxCheck(String FileName) throws IOException{
-		runSyntaxCheck(new File(FileName));
+	private static void runSyntaxCheck(String fileName) throws IOException{
+		runSyntaxCheck(new File(fileName));
 	}
 
 	private static void runSyntaxCheck(File file) throws IOException {

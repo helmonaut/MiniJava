@@ -1,4 +1,3 @@
-// vi:ai:noet sta sw=4 ts=4 sts=0
 package edu.kit.pp.minijava;
 
 import edu.kit.pp.minijava.tokens.*;
@@ -13,14 +12,15 @@ public class Lexer {
 	private PushbackReader _reader;
 	private int _line = 1;
 	private int _column = 1;
+	private int _lastTab = 0;
 	private final int TABSIZE= 4;
 
-	private boolean _lastCharIsCRLF= false;
+	private boolean _lastCharIsCRLF = false;
 
-	private ArrayList<Integer> _lineLengths= new ArrayList<Integer>();
+	private ArrayList<Integer> _lineLengths = new ArrayList<Integer>();
 
 	public Lexer(Reader reader) throws IOException {
-		final int UNDOBUFFERSIZE= 2;
+		final int UNDOBUFFERSIZE = 2;
 		_reader = new PushbackReader(new BufferedReader(reader), UNDOBUFFERSIZE);
 	}
 
@@ -37,11 +37,8 @@ public class Lexer {
 			int c = read();
 			switch (c) {
 			case '\n':
-				break;
 			case ' ':
-				break;
 			case '\r':
-				break;
 			case '\t':
 				break;
 			case '/':
@@ -230,17 +227,16 @@ public class Lexer {
 		}
 	}
 
-	private int _lastTab = 0;
 	private int read() throws IOException {
-		int c= (short)_reader.read();
+		int c = (short)_reader.read();
 		if (c == '\r') {
-			_lastCharIsCRLF= false;
+			_lastCharIsCRLF = false;
 
-			int nextchar= (short)_reader.read();
+			int nextchar = (short)_reader.read();
 			if (nextchar == '\n') {
-				_lastCharIsCRLF= true;
-				c= nextchar;
-			}			
+				_lastCharIsCRLF = true;
+				c = nextchar;
+			}
 			else {
 				_reader.unread(nextchar);
 			}
@@ -269,23 +265,23 @@ public class Lexer {
 	private void unread(int c) throws IOException {
 		if (c == '\n') {
 			if (_lastCharIsCRLF == true) {
-				_lastCharIsCRLF= false;
+				_lastCharIsCRLF = false;
 				_reader.unread('\n');
 				_reader.unread('\r');
-				_column= _lineLengths.remove(_lineLengths.size()-1).intValue();
+				_column = _lineLengths.remove(_lineLengths.size()-1).intValue();
 				_line--;
 				return;
 			}
 			else {
 				_reader.unread(c);
-				_column= _lineLengths.remove(_lineLengths.size()-1).intValue();
+				_column = _lineLengths.remove(_lineLengths.size()-1).intValue();
 				_line--;
 				return;
 			}
 		}
 		else if (c == '\r') {
 			_reader.unread(c);
-			_column= _lineLengths.remove(_lineLengths.size()-1).intValue();
+			_column = _lineLengths.remove(_lineLengths.size()-1).intValue();
 			_line--;
 			return;
 		}
@@ -294,9 +290,9 @@ public class Lexer {
 			//tab sizes
 			_column -= _lastTab;
 		}
-		else 
+		else
 			_column--;
-		
+
 		_reader.unread(c);
 	}
 
