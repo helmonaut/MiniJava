@@ -286,7 +286,6 @@ public class Parser {
 		if(acceptToken(";")) {
 			expectToken(";");
 			cd.add(new Field(t, id));
-			return;
 		}
 		// Method
 		else {
