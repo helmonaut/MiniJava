@@ -470,7 +470,7 @@ public class Parser {
 	}
 
 	public Expression parseExpression(int precedence) {
-		ParserFunction pf = _expressionParsers.get(getCurrentToken().toString());
+		ParserFunction pf = _expressionParsers.get(getCurrentToken().getValue());
 		Expression left;
 
 		if (pf != null && pf._parseExpressionPrefixFunction != null)
