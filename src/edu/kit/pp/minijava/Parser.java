@@ -592,7 +592,7 @@ public class Parser {
 		expectToken("]");
 
 		int fieldCount = 1;
-		while (acceptToken("[") && acceptToken("]",1)) {
+		while (acceptToken("[")) {
 			expectToken("[");
 			expectToken("]");
 			fieldCount += 1;
