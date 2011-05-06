@@ -19,6 +19,10 @@ public abstract class TokenHelper {
 		return new Keyword(s);
 	}
 
+	public static Token IL(String s) {
+		return new IntegerLiteral(s);
+	}
+
 	public static Token EOF() {
 		return new Eof();
 	}

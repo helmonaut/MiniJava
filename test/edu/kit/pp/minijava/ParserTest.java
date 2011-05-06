@@ -136,6 +136,14 @@ public class ParserTest extends TokenHelper {
 		}
 	}
 
+	@Test(expected=Exception.class)
+	public void parseNewArrayExpression() throws Exception {
+		Parser p = createParserFromTokens(K("int"), O("["), O("]"), O("["), O("]"), I("x"), O("="), K("new"), K("int"), O("["), IL("10"), O("]"), O("["), IL("10"), O("]"), O(";"));
+		java.lang.reflect.Method m = Parser.class.getDeclaredMethod("parseBlockStatement", Block.class);
+		m.setAccessible(true);
+		m.invoke(p, new Block());
+	}
+
 	private Parser createParserFromTokens(Token ... tokens) throws Exception {
 		Lexer l = mock(Lexer.class);
 		OngoingStubbing stub = when(l.next());
