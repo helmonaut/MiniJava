@@ -11,7 +11,7 @@ import org.mockito.stubbing.OngoingStubbing;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class ParserTest {
+public class ParserTest extends TokenHelper {
 
 	public ParserTest() {
 	}
@@ -31,11 +31,11 @@ public class ParserTest {
 	@After
 	public void tearDown() {
 	}
-	
+
 	@Test
 	public void parseClassMember() throws Exception {
-		Parser p= createParserFromTokensWithEOF(K("class"), I("classic"), O("{"), 
-				K("public"), K("int"), I("i"), O(";"), 
+		Parser p= createParserFromTokensWithEOF(K("class"), I("classic"), O("{"),
+				K("public"), K("int"), I("i"), O(";"),
 				K("public"), K("int"), O("["), O("]"), O("["), O("]"), I("intArray"), O(";"),
 				O("}"));
 		p.parseProgram();
@@ -62,7 +62,7 @@ public class ParserTest {
 		assertEquals("b", ((BinaryExpression) e.getRight()).getLeft().getToken().getValue());
 		assertEquals("c", ((BinaryExpression) e.getRight()).getRight().getToken().getValue());
 	}
-	
+
 	@Test
 	public void parseSimpleAdditionAndMultiplicationExpressionWithUnaryOperators() throws Exception {
 		Parser p = createParserFromTokens(O("-"), I("a"), O("+"), O("-"), I("b"), O("*"), O("-"), I("c"));
@@ -150,25 +150,5 @@ public class ParserTest {
 		System.arraycopy(tokens, 0, ts, 0, tokens.length);
 		ts[tokens.length] = EOF();
 		return createParserFromTokens(ts);
-	}
-
-	private Token I() {
-		return I("generated_identifier");
-	}
-
-	private Token I(String s) {
-		return new Identifier(s);
-	}
-
-	private Token O(String s) {
-		return new Operator(s);
-	}
-
-	private Token K(String s) {
-		return new Keyword(s);
-	}
-
-	private Token EOF() {
-		return new edu.kit.pp.minijava.tokens.Eof();
 	}
 }

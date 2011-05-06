@@ -2,6 +2,10 @@ package edu.kit.pp.minijava.ast;
 
 public class Node {
 
+	public String print() {
+		return "";
+	}
+
 	public String toString() {
 		return toString(0);
 	}
