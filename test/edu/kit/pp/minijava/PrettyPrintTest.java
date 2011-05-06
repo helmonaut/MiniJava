@@ -2,7 +2,6 @@ package edu.kit.pp.minijava;
 
 import edu.kit.pp.minijava.ast.BinaryExpression;
 import edu.kit.pp.minijava.ast.PrimaryExpression;
-import edu.kit.pp.minijava.tokens.Operator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

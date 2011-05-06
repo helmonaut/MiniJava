@@ -2,7 +2,6 @@ package edu.kit.pp.minijava;
 
 import edu.kit.pp.minijava.tokens.Eof;
 import edu.kit.pp.minijava.tokens.Token;
-import java.io.StringReader;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
