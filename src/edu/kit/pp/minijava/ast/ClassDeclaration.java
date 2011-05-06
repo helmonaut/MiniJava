@@ -18,18 +18,6 @@ public class ClassDeclaration extends Node {
 		_fields = new LinkedList<Field>();
 	}
 
-	public void add(ClassMember member) {
-		if (member instanceof Field) {
-			add((Field) member);
-		}
-		else if (member instanceof Method) {
-			add((Method) member);
-		}
-		else if (member instanceof MainMethod) {
-			add((MainMethod) member);
-		}
-	}
-
 	public void add(Field field) {
 		_fields.add(field);
 	}

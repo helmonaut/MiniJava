@@ -258,19 +258,19 @@ public class Parser {
 		expectToken("{");
 		ClassDeclaration cd = new ClassDeclaration(name);
 		while (acceptToken("public")) {
-			cd.add(parseClassMember());
+			parseClassMember(cd);
 		}
 		expectToken("}");
 		return cd;
 	}
 
-	private ClassMember parseClassMember() {
+	private void parseClassMember(ClassDeclaration cd) {
 		if (acceptToken("public")) {
 			if (acceptToken("static", 1)) {
-				return parseMainMethod();
+				parseMainMethod(cd);
 			}
 			else {
-				return parseFieldOrMethod();
+				parseFieldOrMethod(cd);
 			}
 		}
 		else {
@@ -278,26 +278,28 @@ public class Parser {
 		}
 	}
 
-	private ClassMember parseFieldOrMethod() throws UnexpectedTokenException {
+	private void parseFieldOrMethod(ClassDeclaration cd) throws UnexpectedTokenException {
 		expectToken("public");
 		Type t = parseType();
 		Identifier id = expectIdentifier();
 		// Field
 		if(acceptToken(";")) {
 			expectToken(";");
-			return new Field(t, id);
+			cd.add(new Field(t, id));
 		}
 		// Method
-		expectToken("(");
-		Parameters p = null;
-		if (!acceptToken(")"))
-			p = parseParameters();
-		expectToken(")");
-		Block b = parseBlock();
-		return new Method(t, id, b, p);
+		else {
+			expectToken("(");
+			Parameters p = null;
+			if (!acceptToken(")"))
+				p = parseParameters();
+			expectToken(")");
+			Block b = parseBlock();
+			cd.add(new Method(t, id, b, p));
+		}
 	}
 
-	private MainMethod parseMainMethod() {
+	private void parseMainMethod(ClassDeclaration cd) {
 		expectToken("public");
 		expectToken("static");
 		expectToken("void");
@@ -309,7 +311,7 @@ public class Parser {
 		Identifier variableName = expectIdentifier();
 		expectToken(")");
 		Block b = parseBlock();
-		return new MainMethod(name, variableName, b);
+		cd.add(new MainMethod(name, variableName, b));
 	}
 
 	// TODO So richtig?
