@@ -1,5 +1,6 @@
 package edu.kit.pp.minijava.ast;
 
+import edu.kit.pp.minijava.NodeVisitor;
 import edu.kit.pp.minijava.tokens.Token;
 
 public class BinaryExpression extends Expression {
@@ -18,5 +19,10 @@ public class BinaryExpression extends Expression {
 
 	public Expression getRight() {
 		return _right;
+	}
+	
+	@Override
+	public String acceptVisitor(NodeVisitor visitor) {
+		return visitor.process(this);
 	}
 }

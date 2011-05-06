@@ -1,5 +1,7 @@
 package edu.kit.pp.minijava.ast;
 
+import edu.kit.pp.minijava.NodeVisitor;
+
 public class Node {
 
 	public String print() {
@@ -56,4 +58,7 @@ public class Node {
 		return result;
 	}
 
+	String acceptVisitor(NodeVisitor visitor) {
+		return visitor.process(this);
+	}
 }

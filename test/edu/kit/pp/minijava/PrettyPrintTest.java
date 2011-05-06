@@ -35,5 +35,7 @@ public class PrettyPrintTest extends TokenHelper {
 	public void printSimpleExpression() throws Exception {
 		BinaryExpression e = new BinaryExpression(O("+"), new PrimaryExpression(I("a")), new PrimaryExpression(I("b")));
 		assertEquals("(a + b)", e.print());
+//		PrettyPrinter pp= new PrettyPrinter();
+//		assertEquals("(a + b)", pp.process(e));
 	}
 }
