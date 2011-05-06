@@ -82,6 +82,13 @@ public class MiniJava {
 		System.out.println("Correct Syntax");
 	}
 
+	public static void printAST(String fileName) throws IOException {
+		Lexer lexer = new Lexer(new FileReader(fileName));
+		Parser parser = new Parser(lexer);
+		Program program = parser.parseProgram();
+		System.out.print(program.print());
+	}
+
 
 	public static void main(String[] args) throws IOException {
 		if (args.length == 0) {
@@ -89,8 +96,13 @@ public class MiniJava {
 			return;
 		}
 
-		if (args[0].equals("--lextest")) runLexTest(args[args.length -1]);
-		else if(args[0].equals("--syntaxcheck")) runSyntaxCheck(args[args.length -1]);
-		else if(args[0].equals("--testdir")) runTestFiles(args[args.length - 1]);
+		if (args[0].equals("--lextest"))
+			runLexTest(args[args.length -1]);
+		else if(args[0].equals("--syntaxcheck"))
+			runSyntaxCheck(args[args.length -1]);
+		else if(args[0].equals("--testdir"))
+			runTestFiles(args[args.length - 1]);
+		else if(args[0].equals("--print-ast"))
+			printAST(args[args.length - 1]);
 	}
 }
