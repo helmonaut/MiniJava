@@ -21,4 +21,12 @@ public interface NodeVisitor {
 	void processPostfixExpression(PostfixExpression postfixExpr);
 	void processPrimaryExpression(PrimaryExpression primExp);
 	void processUnaryExpression(UnaryExpression unaryExp);
+	void processPostfixOp(PostfixOp postfixOp);
+	void processLocalMethodInvocExpr(LocalMethodInvocationExpression locMethInvocExpr);
+	void processNewObjectExpression(NewObjectExpression newObjExpr);
+	void processNewArrayExpression(NewArrayExpression newArrayExpr);
+	void processMethodInvocation(MethodInvocation methodInvoc);
+	void processFieldAccess(Field field);
+	void processArrayAccess(ArrayAccess arrayAccess);
+	void processArguments(Arguments arguments);
 }
