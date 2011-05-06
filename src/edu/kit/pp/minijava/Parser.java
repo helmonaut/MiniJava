@@ -355,36 +355,55 @@ public class Parser {
 	}
 
 	private Statement parseStatement() {
-		if (acceptToken("{"))
-			return parseBlock();
-		else if (acceptToken(";"))
-			return parseEmptyStatement();
-		else if (acceptToken("if"))
-			return parseIfStatement();
-		else if (acceptToken("while"))
-			return parseWhileStatement();
-		else if (acceptToken("return"))
-			return parseReturnStatement();
-		else
-			return parseExpressionStatement();
+		return parseStatement(new Block());
+	}
+
+	private Statement parseStatement(Block b) {
+		Statement result;
+		if (acceptToken("{")) {
+			result = parseBlock();
+			b.add(result);
+		}
+		else if (acceptToken(";")) {
+			result = parseEmptyStatement();
+		}
+		else if (acceptToken("if")) {
+			result = parseIfStatement();
+			b.add(result);
+		}
+		else if (acceptToken("while")) {
+			result = parseWhileStatement();
+			b.add(result);
+		}
+		else if (acceptToken("return")) {
+			result = parseReturnStatement();
+			b.add(result);
+		}
+		else {
+			result = parseExpressionStatement();
+			b.add(result);
+		}
+		return result;
 	}
 
 	private Block parseBlock() {
 		expectToken("{");
 		Block b = new Block();
 		while(!acceptToken("}")) {
-			b.add(parseBlockStatement());
+			parseBlockStatement(b);
 		}
 		expectToken("}");
 		return b;
 	}
 
-	private BlockStatement parseBlockStatement() {
+	private void parseBlockStatement(Block b) {
 		if (acceptToken("int") || acceptToken("boolean") || acceptToken("void") ||
 				acceptIdentifier() && (acceptIdentifier(1) || (acceptToken("[", 1) && acceptToken("]", 2)))) {
-			return parseLocalVariableDeclarationStatement();
+			b.add(parseLocalVariableDeclarationStatement());
 		}
-		return parseStatement();
+		else {
+			parseStatement(b);
+		}
 	}
 
 	private LocalVariableDeclarationStatement parseLocalVariableDeclarationStatement() {
